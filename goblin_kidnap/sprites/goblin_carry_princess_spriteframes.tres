@@ -1,0 +1,26 @@
+[gd_resource type="SpriteFrames" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/goblin_carry_princess_01.png" id="1_goblin_carry_princess_1"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/goblin_carry_princess_02.png" id="2_goblin_carry_princess_2"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/goblin_carry_princess_03.png" id="3_goblin_carry_princess_3"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/goblin_carry_princess_04.png" id="4_goblin_carry_princess_4"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_goblin_carry_princess_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_goblin_carry_princess_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_goblin_carry_princess_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_goblin_carry_princess_4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 7.0
+}]

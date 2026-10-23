@@ -1,0 +1,86 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_idle.png" id="1_slime_king_idle"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_walk.png" id="2_slime_king_walk"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_run.png" id="3_slime_king_run"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_attack.png" id="4_slime_king_attack"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_jump.png" id="5_slime_king_jump"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_skill.png" id="6_slime_king_skill"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_hurt.png" id="7_slime_king_hurt"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_death.png" id="8_slime_king_death"]
+[ext_resource type="Texture2D" path="res://assets/monsters/slime_king/frames/slime_king_turn.png" id="9_slime_king_turn"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_slime_king_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_slime_king_walk")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_slime_king_run")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_slime_king_attack")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_slime_king_jump")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_slime_king_skill")
+}],
+"loop": false,
+"name": &"skill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_slime_king_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_slime_king_death")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_slime_king_turn")
+}],
+"loop": false,
+"name": &"turn",
+"speed": 5.0
+}]

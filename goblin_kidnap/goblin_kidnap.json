@@ -1,0 +1,41 @@
+{
+ "goblin_carry_princess": {
+  "title": "Goblin carrying princess",
+  "frame_size": [
+   648,
+   700
+  ],
+  "frames": [
+   "goblin_carry_princess_01.png",
+   "goblin_carry_princess_02.png",
+   "goblin_carry_princess_03.png",
+   "goblin_carry_princess_04.png"
+  ]
+ },
+ "princess_crying": {
+  "title": "Princess crying & shouting",
+  "frame_size": [
+   628,
+   668
+  ],
+  "frames": [
+   "princess_crying_01.png",
+   "princess_crying_02.png",
+   "princess_crying_03.png",
+   "princess_crying_04.png"
+  ]
+ },
+ "goblin_laughing": {
+  "title": "Goblin laughing",
+  "frame_size": [
+   600,
+   748
+  ],
+  "frames": [
+   "goblin_laughing_01.png",
+   "goblin_laughing_02.png",
+   "goblin_laughing_03.png",
+   "goblin_laughing_04.png"
+  ]
+ }
+}

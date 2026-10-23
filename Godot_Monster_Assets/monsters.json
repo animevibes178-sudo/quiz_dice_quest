@@ -1,0 +1,405 @@
+{
+ "goblin": {
+  "name": "Goblin",
+  "boss": false,
+  "hp": 20,
+  "atk": 4,
+  "def": 1,
+  "frame_size": [
+   356,
+   220
+  ],
+  "animations": {
+   "idle": [
+    "goblin_idle.png"
+   ],
+   "walk": [
+    "goblin_walk.png"
+   ],
+   "run": [
+    "goblin_run.png"
+   ],
+   "attack": [
+    "goblin_attack.png"
+   ],
+   "jump": [
+    "goblin_jump.png"
+   ],
+   "skill": [
+    "goblin_skill.png"
+   ],
+   "hurt": [
+    "goblin_hurt.png"
+   ],
+   "death": [
+    "goblin_death_1.png",
+    "goblin_death_2.png"
+   ],
+   "turn": [
+    "goblin_turn.png"
+   ]
+  }
+ },
+ "bat": {
+  "name": "Bat",
+  "boss": false,
+  "hp": 18,
+  "atk": 5,
+  "def": 1,
+  "frame_size": [
+   348,
+   204
+  ],
+  "animations": {
+   "idle": [
+    "bat_idle.png"
+   ],
+   "walk": [
+    "bat_walk.png"
+   ],
+   "run": [
+    "bat_run.png"
+   ],
+   "attack": [
+    "bat_attack.png"
+   ],
+   "jump": [
+    "bat_jump.png"
+   ],
+   "skill": [
+    "bat_skill.png"
+   ],
+   "hurt": [
+    "bat_hurt.png"
+   ],
+   "death": [
+    "bat_death_1.png",
+    "bat_death_2.png"
+   ],
+   "turn": [
+    "bat_turn.png"
+   ]
+  }
+ },
+ "skeleton": {
+  "name": "Skeleton",
+  "boss": false,
+  "hp": 25,
+  "atk": 6,
+  "def": 2,
+  "frame_size": [
+   364,
+   216
+  ],
+  "animations": {
+   "idle": [
+    "skeleton_idle.png"
+   ],
+   "walk": [
+    "skeleton_walk.png"
+   ],
+   "run": [
+    "skeleton_run.png"
+   ],
+   "attack": [
+    "skeleton_attack.png"
+   ],
+   "jump": [
+    "skeleton_jump.png"
+   ],
+   "skill": [
+    "skeleton_skill.png"
+   ],
+   "hurt": [
+    "skeleton_hurt.png"
+   ],
+   "death": [
+    "skeleton_death.png"
+   ],
+   "turn": [
+    "skeleton_turn.png"
+   ]
+  }
+ },
+ "slime": {
+  "name": "Slime",
+  "boss": false,
+  "hp": 22,
+  "atk": 5,
+  "def": 1,
+  "frame_size": [
+   272,
+   212
+  ],
+  "animations": {
+   "idle": [
+    "slime_idle.png"
+   ],
+   "walk": [
+    "slime_walk.png"
+   ],
+   "run": [
+    "slime_run.png"
+   ],
+   "attack": [
+    "slime_attack.png"
+   ],
+   "jump": [
+    "slime_jump.png"
+   ],
+   "skill": [
+    "slime_skill.png"
+   ],
+   "hurt": [
+    "slime_hurt.png"
+   ],
+   "death": [
+    "slime_death_1.png",
+    "slime_death_2.png"
+   ],
+   "turn": [
+    "slime_turn.png"
+   ]
+  }
+ },
+ "wolf": {
+  "name": "Wolf",
+  "boss": false,
+  "hp": 28,
+  "atk": 7,
+  "def": 2,
+  "frame_size": [
+   332,
+   216
+  ],
+  "animations": {
+   "idle": [
+    "wolf_idle.png"
+   ],
+   "walk": [
+    "wolf_walk.png"
+   ],
+   "run": [
+    "wolf_run.png"
+   ],
+   "attack": [
+    "wolf_attack.png"
+   ],
+   "jump": [
+    "wolf_jump.png"
+   ],
+   "skill": [
+    "wolf_skill.png"
+   ],
+   "hurt": [
+    "wolf_hurt.png"
+   ],
+   "death": [
+    "wolf_death.png"
+   ],
+   "turn": [
+    "wolf_turn.png"
+   ]
+  }
+ },
+ "slime_king": {
+  "name": "Slime King (Stage 1 Boss)",
+  "boss": true,
+  "hp": 50,
+  "atk": 9,
+  "def": 2,
+  "frame_size": [
+   352,
+   268
+  ],
+  "animations": {
+   "idle": [
+    "slime_king_idle.png"
+   ],
+   "walk": [
+    "slime_king_walk.png"
+   ],
+   "run": [
+    "slime_king_run.png"
+   ],
+   "attack": [
+    "slime_king_attack.png"
+   ],
+   "jump": [
+    "slime_king_jump.png"
+   ],
+   "skill": [
+    "slime_king_skill.png"
+   ],
+   "hurt": [
+    "slime_king_hurt.png"
+   ],
+   "death": [
+    "slime_king_death.png"
+   ],
+   "turn": [
+    "slime_king_turn.png"
+   ]
+  }
+ },
+ "stone_golem": {
+  "name": "Stone Golem (Stage 2 Boss)",
+  "boss": true,
+  "hp": 90,
+  "atk": 13,
+  "def": 4,
+  "frame_size": [
+   484,
+   264
+  ],
+  "animations": {
+   "idle": [
+    "stone_golem_idle.png"
+   ],
+   "walk": [
+    "stone_golem_walk.png"
+   ],
+   "run": [
+    "stone_golem_run.png"
+   ],
+   "attack": [
+    "stone_golem_attack.png"
+   ],
+   "jump": [
+    "stone_golem_jump.png"
+   ],
+   "skill": [
+    "stone_golem_skill.png"
+   ],
+   "hurt": [
+    "stone_golem_hurt.png"
+   ],
+   "death": [
+    "stone_golem_death.png"
+   ],
+   "turn": [
+    "stone_golem_turn.png"
+   ]
+  }
+ },
+ "shadow_witch": {
+  "name": "Shadow Witch (Stage 3 Boss)",
+  "boss": true,
+  "hp": 140,
+  "atk": 18,
+  "def": 6,
+  "frame_size": [
+   328,
+   260
+  ],
+  "animations": {
+   "idle": [
+    "shadow_witch_idle.png"
+   ],
+   "walk": [
+    "shadow_witch_walk.png"
+   ],
+   "run": [
+    "shadow_witch_run.png"
+   ],
+   "attack": [
+    "shadow_witch_attack.png"
+   ],
+   "jump": [
+    "shadow_witch_jump.png"
+   ],
+   "skill": [
+    "shadow_witch_skill.png"
+   ],
+   "hurt": [
+    "shadow_witch_hurt.png"
+   ],
+   "death": [
+    "shadow_witch_death.png"
+   ],
+   "turn": [
+    "shadow_witch_turn.png"
+   ]
+  }
+ },
+ "dragon_lord": {
+  "name": "Dragon Lord (Stage 4 Boss)",
+  "boss": true,
+  "hp": 200,
+  "atk": 24,
+  "def": 8,
+  "frame_size": [
+   464,
+   260
+  ],
+  "animations": {
+   "idle": [
+    "dragon_lord_idle.png"
+   ],
+   "walk": [
+    "dragon_lord_walk.png"
+   ],
+   "run": [
+    "dragon_lord_run.png"
+   ],
+   "attack": [
+    "dragon_lord_attack.png"
+   ],
+   "jump": [
+    "dragon_lord_jump.png"
+   ],
+   "skill": [
+    "dragon_lord_skill.png"
+   ],
+   "hurt": [
+    "dragon_lord_hurt.png"
+   ],
+   "death": [
+    "dragon_lord_death.png"
+   ],
+   "turn": [
+    "dragon_lord_turn.png"
+   ]
+  }
+ },
+ "ancient_titan": {
+  "name": "Ancient Titan (Stage 5 Boss)",
+  "boss": true,
+  "hp": 270,
+  "atk": 30,
+  "def": 10,
+  "frame_size": [
+   400,
+   272
+  ],
+  "animations": {
+   "idle": [
+    "ancient_titan_idle.png"
+   ],
+   "walk": [
+    "ancient_titan_walk.png"
+   ],
+   "run": [
+    "ancient_titan_run.png"
+   ],
+   "attack": [
+    "ancient_titan_attack.png"
+   ],
+   "jump": [
+    "ancient_titan_jump.png"
+   ],
+   "skill": [
+    "ancient_titan_skill.png"
+   ],
+   "hurt": [
+    "ancient_titan_hurt.png"
+   ],
+   "death": [
+    "ancient_titan_death.png"
+   ],
+   "turn": [
+    "ancient_titan_turn.png"
+   ]
+  }
+ }
+}

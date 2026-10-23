@@ -1,0 +1,86 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_idle.png" id="1_wolf_idle"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_walk.png" id="2_wolf_walk"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_run.png" id="3_wolf_run"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_attack.png" id="4_wolf_attack"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_jump.png" id="5_wolf_jump"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_skill.png" id="6_wolf_skill"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_hurt.png" id="7_wolf_hurt"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_death.png" id="8_wolf_death"]
+[ext_resource type="Texture2D" path="res://assets/monsters/wolf/frames/wolf_turn.png" id="9_wolf_turn"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_wolf_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_wolf_walk")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_wolf_run")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_wolf_attack")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_wolf_jump")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_wolf_skill")
+}],
+"loop": false,
+"name": &"skill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_wolf_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_wolf_death")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_wolf_turn")
+}],
+"loop": false,
+"name": &"turn",
+"speed": 5.0
+}]

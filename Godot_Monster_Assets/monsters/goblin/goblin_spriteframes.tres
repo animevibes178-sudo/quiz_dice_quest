@@ -1,0 +1,90 @@
+[gd_resource type="SpriteFrames" load_steps=11 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_idle.png" id="1_goblin_idle"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_walk.png" id="2_goblin_walk"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_run.png" id="3_goblin_run"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_attack.png" id="4_goblin_attack"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_jump.png" id="5_goblin_jump"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_skill.png" id="6_goblin_skill"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_hurt.png" id="7_goblin_hurt"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_death_1.png" id="8_goblin_death_1"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_death_2.png" id="9_goblin_death_2"]
+[ext_resource type="Texture2D" path="res://assets/monsters/goblin/frames/goblin_turn.png" id="10_goblin_turn"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_goblin_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_goblin_walk")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_goblin_run")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_goblin_attack")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_goblin_jump")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_goblin_skill")
+}],
+"loop": false,
+"name": &"skill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_goblin_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_goblin_death_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_goblin_death_2")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_goblin_turn")
+}],
+"loop": false,
+"name": &"turn",
+"speed": 5.0
+}]

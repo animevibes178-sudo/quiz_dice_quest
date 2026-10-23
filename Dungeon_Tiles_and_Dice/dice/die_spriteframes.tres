@@ -1,0 +1,100 @@
+[gd_resource type="SpriteFrames" load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_1.png" id="1_f"]
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_2.png" id="2_f"]
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_3.png" id="3_f"]
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_4.png" id="4_f"]
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_5.png" id="5_f"]
+[ext_resource type="Texture2D" path="res://assets/dice/die_face_6.png" id="6_f"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_f")
+}],
+"loop": false,
+"name": &"face_1",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_f")
+}],
+"loop": false,
+"name": &"face_2",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_f")
+}],
+"loop": false,
+"name": &"face_3",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_f")
+}],
+"loop": false,
+"name": &"face_4",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_f")
+}],
+"loop": false,
+"name": &"face_5",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_f")
+}],
+"loop": false,
+"name": &"face_6",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_f")
+}],
+"loop": true,
+"name": &"roll",
+"speed": 14.0
+}]

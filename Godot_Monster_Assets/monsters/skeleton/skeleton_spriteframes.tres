@@ -1,0 +1,86 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_idle.png" id="1_skeleton_idle"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_walk.png" id="2_skeleton_walk"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_run.png" id="3_skeleton_run"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_attack.png" id="4_skeleton_attack"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_jump.png" id="5_skeleton_jump"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_skill.png" id="6_skeleton_skill"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_hurt.png" id="7_skeleton_hurt"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_death.png" id="8_skeleton_death"]
+[ext_resource type="Texture2D" path="res://assets/monsters/skeleton/frames/skeleton_turn.png" id="9_skeleton_turn"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_skeleton_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_skeleton_walk")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_skeleton_run")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_skeleton_attack")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_skeleton_jump")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_skeleton_skill")
+}],
+"loop": false,
+"name": &"skill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_skeleton_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_skeleton_death")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_skeleton_turn")
+}],
+"loop": false,
+"name": &"turn",
+"speed": 5.0
+}]

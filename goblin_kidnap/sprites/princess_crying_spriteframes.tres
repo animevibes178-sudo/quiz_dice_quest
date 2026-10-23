@@ -1,0 +1,26 @@
+[gd_resource type="SpriteFrames" load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/princess_crying_01.png" id="1_princess_crying_1"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/princess_crying_02.png" id="2_princess_crying_2"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/princess_crying_03.png" id="3_princess_crying_3"]
+[ext_resource type="Texture2D" path="res://assets/goblin_kidnap/sprites/frames/princess_crying_04.png" id="4_princess_crying_4"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_princess_crying_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_princess_crying_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_princess_crying_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_princess_crying_4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 7.0
+}]

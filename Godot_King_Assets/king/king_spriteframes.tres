@@ -1,0 +1,76 @@
+[gd_resource type="SpriteFrames" load_steps=15 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_idle_01.png" id="1_idle_1"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_idle_02.png" id="2_idle_2"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_idle_03.png" id="3_idle_3"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_idle_04.png" id="4_idle_4"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_talking_01.png" id="5_talking_1"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_talking_02.png" id="6_talking_2"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_talking_03.png" id="7_talking_3"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_talking_04.png" id="8_talking_4"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_01.png" id="9_walk_1"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_02.png" id="10_walk_2"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_03.png" id="11_walk_3"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_04.png" id="12_walk_4"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_05.png" id="13_walk_5"]
+[ext_resource type="Texture2D" path="res://assets/king/frames/king_walk_06.png" id="14_walk_6"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_idle_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_idle_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_idle_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_idle_4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_talking_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_talking_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_talking_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_talking_4")
+}],
+"loop": true,
+"name": &"talking",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_walk_1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_walk_2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_walk_3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_walk_4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_walk_5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_walk_6")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 8.0
+}]

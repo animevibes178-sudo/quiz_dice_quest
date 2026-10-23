@@ -1,0 +1,4 @@
+[gd_scene format=3 uid="uid://be4wh103u1hct"]
+
+[node name="IntroStory" type="Node2D" unique_id=40233470]
+position = Vector2(27, 34)

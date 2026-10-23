@@ -1,0 +1,119 @@
+{
+ "frame_size": [
+  712,
+  560
+ ],
+ "facing": "right",
+ "animations": {
+  "idle": {
+   "frames": [
+    "hero_idle_01.png",
+    "hero_idle_02.png",
+    "hero_idle_03.png",
+    "hero_idle_04.png",
+    "hero_idle_05.png",
+    "hero_idle_06.png",
+    "hero_idle_07.png",
+    "hero_idle_08.png"
+   ],
+   "fps": 8,
+   "loop": true
+  },
+  "walk": {
+   "frames": [
+    "hero_walk_01.png",
+    "hero_walk_02.png",
+    "hero_walk_03.png",
+    "hero_walk_04.png",
+    "hero_walk_05.png",
+    "hero_walk_06.png",
+    "hero_walk_07.png",
+    "hero_walk_08.png"
+   ],
+   "fps": 10,
+   "loop": true
+  },
+  "run": {
+   "frames": [
+    "hero_run_01.png",
+    "hero_run_02.png",
+    "hero_run_03.png",
+    "hero_run_04.png",
+    "hero_run_05.png",
+    "hero_run_06.png",
+    "hero_run_07.png",
+    "hero_run_08.png",
+    "hero_run_09.png"
+   ],
+   "fps": 12,
+   "loop": true
+  },
+  "jump": {
+   "frames": [
+    "hero_jump_01.png",
+    "hero_jump_02.png",
+    "hero_jump_03.png",
+    "hero_jump_04.png",
+    "hero_jump_05.png",
+    "hero_jump_06.png"
+   ],
+   "fps": 8,
+   "loop": false
+  },
+  "attack": {
+   "frames": [
+    "hero_attack_01.png",
+    "hero_attack_02.png",
+    "hero_attack_03.png",
+    "hero_attack_04.png",
+    "hero_attack_05.png",
+    "hero_attack_06.png",
+    "hero_attack_07.png",
+    "hero_attack_08.png"
+   ],
+   "fps": 14,
+   "loop": false
+  },
+  "skill": {
+   "frames": [
+    "hero_skill_01.png",
+    "hero_skill_02.png",
+    "hero_skill_03.png",
+    "hero_skill_04.png"
+   ],
+   "fps": 10,
+   "loop": false
+  },
+  "hurt": {
+   "frames": [
+    "hero_hurt_01.png",
+    "hero_hurt_02.png",
+    "hero_hurt_03.png",
+    "hero_hurt_04.png",
+    "hero_hurt_05.png"
+   ],
+   "fps": 10,
+   "loop": false
+  },
+  "death": {
+   "frames": [
+    "hero_death_01.png",
+    "hero_death_02.png",
+    "hero_death_03.png",
+    "hero_death_04.png"
+   ],
+   "fps": 8,
+   "loop": false
+  },
+  "turn": {
+   "frames": [
+    "hero_turn_01.png",
+    "hero_turn_02.png",
+    "hero_turn_03.png",
+    "hero_turn_04.png"
+   ],
+   "fps": 8,
+   "loop": false
+  }
+ }
+}

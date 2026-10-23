@@ -1,0 +1,205 @@
+{
+ "start": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   0,
+   0
+  ]
+ },
+ "enemy": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   1,
+   0
+  ]
+ },
+ "heal": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   2,
+   0
+  ]
+ },
+ "chest": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   3,
+   0
+  ]
+ },
+ "empty": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   4,
+   0
+  ]
+ },
+ "boss": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   5,
+   0
+  ]
+ },
+ "trap": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   6,
+   0
+  ]
+ },
+ "bonus": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   7,
+   0
+  ]
+ },
+ "skip": {
+  "set": "set1_classic",
+  "atlas_coords": [
+   8,
+   0
+  ]
+ },
+ "portal": {
+  "set": "set2_events",
+  "atlas_coords": [
+   0,
+   1
+  ]
+ },
+ "shop": {
+  "set": "set2_events",
+  "atlas_coords": [
+   1,
+   1
+  ]
+ },
+ "key": {
+  "set": "set2_events",
+  "atlas_coords": [
+   2,
+   1
+  ]
+ },
+ "potion": {
+  "set": "set2_events",
+  "atlas_coords": [
+   3,
+   1
+  ]
+ },
+ "mystery": {
+  "set": "set2_events",
+  "atlas_coords": [
+   4,
+   1
+  ]
+ },
+ "fire": {
+  "set": "set3_hazards",
+  "atlas_coords": [
+   0,
+   2
+  ]
+ },
+ "poison": {
+  "set": "set3_hazards",
+  "atlas_coords": [
+   1,
+   2
+  ]
+ },
+ "ice": {
+  "set": "set3_hazards",
+  "atlas_coords": [
+   2,
+   2
+  ]
+ },
+ "lightning": {
+  "set": "set3_hazards",
+  "atlas_coords": [
+   3,
+   2
+  ]
+ },
+ "bomb": {
+  "set": "set3_hazards",
+  "atlas_coords": [
+   4,
+   2
+  ]
+ },
+ "slime": {
+  "set": "set4_monsters",
+  "atlas_coords": [
+   0,
+   3
+  ]
+ },
+ "bat": {
+  "set": "set4_monsters",
+  "atlas_coords": [
+   1,
+   3
+  ]
+ },
+ "goblin": {
+  "set": "set4_monsters",
+  "atlas_coords": [
+   2,
+   3
+  ]
+ },
+ "ghost": {
+  "set": "set4_monsters",
+  "atlas_coords": [
+   3,
+   3
+  ]
+ },
+ "evil_eye": {
+  "set": "set4_monsters",
+  "atlas_coords": [
+   4,
+   3
+  ]
+ },
+ "sword": {
+  "set": "set5_items",
+  "atlas_coords": [
+   0,
+   4
+  ]
+ },
+ "shield": {
+  "set": "set5_items",
+  "atlas_coords": [
+   1,
+   4
+  ]
+ },
+ "scroll": {
+  "set": "set5_items",
+  "atlas_coords": [
+   2,
+   4
+  ]
+ },
+ "gold": {
+  "set": "set5_items",
+  "atlas_coords": [
+   3,
+   4
+  ]
+ },
+ "hourglass": {
+  "set": "set5_items",
+  "atlas_coords": [
+   4,
+   4
+  ]
+ }
+}

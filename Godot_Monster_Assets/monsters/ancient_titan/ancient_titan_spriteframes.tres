@@ -1,0 +1,86 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_idle.png" id="1_ancient_titan_idle"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_walk.png" id="2_ancient_titan_walk"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_run.png" id="3_ancient_titan_run"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_attack.png" id="4_ancient_titan_attack"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_jump.png" id="5_ancient_titan_jump"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_skill.png" id="6_ancient_titan_skill"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_hurt.png" id="7_ancient_titan_hurt"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_death.png" id="8_ancient_titan_death"]
+[ext_resource type="Texture2D" path="res://assets/monsters/ancient_titan/frames/ancient_titan_turn.png" id="9_ancient_titan_turn"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ancient_titan_idle")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_ancient_titan_walk")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_ancient_titan_run")
+}],
+"loop": true,
+"name": &"run",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_ancient_titan_attack")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_ancient_titan_jump")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_ancient_titan_skill")
+}],
+"loop": false,
+"name": &"skill",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_ancient_titan_hurt")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_ancient_titan_death")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_ancient_titan_turn")
+}],
+"loop": false,
+"name": &"turn",
+"speed": 5.0
+}]

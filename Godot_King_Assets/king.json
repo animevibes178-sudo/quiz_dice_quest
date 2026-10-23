@@ -1,0 +1,33 @@
+{
+ "frame_size": [
+  648,
+  736
+ ],
+ "facing": {
+  "idle": "front",
+  "talking": "front",
+  "walk": "right"
+ },
+ "animations": {
+  "idle": [
+   "king_idle_01.png",
+   "king_idle_02.png",
+   "king_idle_03.png",
+   "king_idle_04.png"
+  ],
+  "talking": [
+   "king_talking_01.png",
+   "king_talking_02.png",
+   "king_talking_03.png",
+   "king_talking_04.png"
+  ],
+  "walk": [
+   "king_walk_01.png",
+   "king_walk_02.png",
+   "king_walk_03.png",
+   "king_walk_04.png",
+   "king_walk_05.png",
+   "king_walk_06.png"
+  ]
+ }
+}

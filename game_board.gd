@@ -17,6 +17,13 @@ var awaiting_answer := false
 var question_index := 0
 var hero: TextureRect
 var goblin: TextureRect
+var goblin_animation_paths := [
+	"res://Godot_Monster_Assets/monsters/goblin/frames/goblin_idle.png",
+	"res://Godot_Monster_Assets/monsters/goblin/frames/goblin_walk.png",
+	"res://Godot_Monster_Assets/monsters/goblin/frames/goblin_run.png"
+]
+var hero_idle_frame := 1
+var hero_animating := false
 var dice_label: Label
 var status_label: Label
 var path_grid: GridContainer
@@ -178,6 +185,8 @@ func _build_ui() -> void:
 	answer_box.add_theme_constant_override("separation", 6)
 	side_col.add_child(answer_box)
 	_set_hero_frame(1)
+	_start_idle_animation()
+	_start_goblin_animation()
 
 func _panel_style(fill: String, edge: String) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
@@ -218,10 +227,25 @@ func _update_board() -> void:
 func _set_status(message: String) -> void:
 	status_label.text = message
 
-func _set_hero_frame(frame: int) -> void:
-	var path := HERO_IDLE % clampi(frame, 1, 8)
+func _set_hero_frame(frame: int, walking: bool = false) -> void:
+	var path := (HERO_WALK % clampi(frame, 1, 8)) if walking else (HERO_IDLE % clampi(frame, 1, 8))
 	if ResourceLoader.exists(path):
 		hero.texture = load(path)
+
+func _start_idle_animation() -> void:
+	while is_instance_valid(hero):
+		if not hero_animating:
+			hero_idle_frame = (hero_idle_frame % 8) + 1
+			_set_hero_frame(hero_idle_frame)
+		await get_tree().create_timer(0.14).timeout
+
+func _start_goblin_animation() -> void:
+	var frame := 0
+	while is_instance_valid(goblin):
+		if not rolling and not awaiting_answer and ResourceLoader.exists(goblin_animation_paths[frame]):
+			goblin.texture = load(goblin_animation_paths[frame])
+			frame = (frame + 1) % goblin_animation_paths.size()
+		await get_tree().create_timer(0.75).timeout
 
 func _on_roll_pressed() -> void:
 	if rolling or awaiting_answer:
@@ -254,10 +278,13 @@ func _on_roll_pressed() -> void:
 		roll_button.disabled = false
 
 func _move_hero(target: int) -> void:
+	hero_animating = true
 	for next_step in range(step + 1, target + 1):
-		_set_hero_frame(1 + ((next_step - 1) % 8))
-		await get_tree().create_timer(0.13).timeout
+		for frame in range(1, 9):
+			_set_hero_frame(frame, true)
+			await get_tree().create_timer(0.045).timeout
 	_set_hero_frame(1)
+	hero_animating = false
 
 func _show_question() -> void:
 	awaiting_answer = true
@@ -288,12 +315,19 @@ func _on_answer_selected(selected: int, correct: int) -> void:
 
 func _show_monster_encounter() -> void:
 	_set_status("A goblin blocks the trail! Your hero prepares for battle.")
+	if ResourceLoader.exists("res://Godot_Monster_Assets/monsters/goblin/frames/goblin_attack.png"):
+		goblin.texture = load("res://Godot_Monster_Assets/monsters/goblin/frames/goblin_attack.png")
 	goblin.modulate = Color("#ffb3a7")
+	var original_x := goblin.position.x
 	var tween := create_tween()
-	tween.tween_property(goblin, "scale", Vector2(1.12, 1.12), 0.18)
+	tween.tween_property(goblin, "position:x", original_x - 18, 0.12)
+	tween.tween_property(goblin, "position:x", original_x + 18, 0.12)
+	tween.tween_property(goblin, "scale", Vector2(1.16, 1.16), 0.18)
 	tween.tween_property(goblin, "scale", Vector2.ONE, 0.18)
 	await tween.finished
 	goblin.modulate = Color.WHITE
+	if ResourceLoader.exists(goblin_animation_paths[0]):
+		goblin.texture = load(goblin_animation_paths[0])
 	roll_button.disabled = false
 
 func _finish_quest() -> void:

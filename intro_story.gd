@@ -355,7 +355,3 @@ func _animate_texture_frames(portrait: TextureRect, frames: Array[String]) -> vo
 				portrait.texture = frame_texture
 			await get_tree().create_timer(0.16).timeout
 
-
-func _on_skip_pressed() -> void:
-	page_index = STORY_PAGES.size() - 1
-	_show_page()

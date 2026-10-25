@@ -32,6 +32,11 @@ var answer_box: VBoxContainer
 var rng := RandomNumberGenerator.new()
 var spaces: Array[PanelContainer] = []
 var board_background: TextureRect
+var battle_overlay: ColorRect
+var battle_hero: TextureRect
+var battle_monster: TextureRect
+var battle_title: Label
+var battle_log: Label
 
 func _ready() -> void:
 	rng.randomize()
@@ -39,6 +44,7 @@ func _ready() -> void:
 	_update_board()
 	_set_status("Your quest begins! Roll the dice to travel toward the dungeon.")
 	_start_background_motion()
+	_build_battle_overlay()
 
 func _build_ui() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -368,22 +374,93 @@ func _flash_feedback(tint: Color) -> void:
 	tween.tween_property(status_label, "modulate", tint, 0.12)
 	tween.tween_property(status_label, "modulate", original, 0.45)
 
+func _build_battle_overlay() -> void:
+	battle_overlay = ColorRect.new()
+	battle_overlay.color = Color(0.015, 0.02, 0.045, 0.88)
+	battle_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	battle_overlay.visible = false
+	battle_overlay.z_index = 50
+	add_child(battle_overlay)
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	battle_overlay.add_child(center)
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(620, 420)
+	panel.add_theme_stylebox_override("panel", _panel_style("#111b2d", "#f5d58a"))
+	center.add_child(panel)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 12)
+	panel.add_child(col)
+	battle_title = Label.new()
+	battle_title.text = "MONSTER ENCOUNTER!"
+	battle_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	battle_title.add_theme_font_size_override("font_size", 28)
+	battle_title.add_theme_color_override("font_color", Color("#f5d58a"))
+	col.add_child(battle_title)
+	var fighters := HBoxContainer.new()
+	fighters.alignment = BoxContainer.ALIGNMENT_CENTER
+	fighters.add_theme_constant_override("separation", 40)
+	col.add_child(fighters)
+	battle_hero = TextureRect.new()
+	battle_hero.custom_minimum_size = Vector2(180, 180)
+	battle_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	battle_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	battle_hero.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	fighters.add_child(battle_hero)
+	battle_monster = TextureRect.new()
+	battle_monster.custom_minimum_size = Vector2(180, 180)
+	battle_monster.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	battle_monster.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	battle_monster.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	fighters.add_child(battle_monster)
+	battle_log = Label.new()
+	battle_log.text = "The hero and goblin face each other!"
+	battle_log.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	battle_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(battle_log)
+
 func _show_monster_encounter() -> void:
-	_set_status("A goblin blocks the trail! Your hero prepares for battle.")
-	if ResourceLoader.exists("res://Godot_Monster_Assets/monsters/goblin/frames/goblin_attack.png"):
-		goblin.texture = load("res://Godot_Monster_Assets/monsters/goblin/frames/goblin_attack.png")
-	goblin.modulate = Color("#ffb3a7")
-	var original_x := goblin.position.x
-	var tween := create_tween()
-	tween.tween_property(goblin, "position:x", original_x - 18, 0.12)
-	tween.tween_property(goblin, "position:x", original_x + 18, 0.12)
-	tween.tween_property(goblin, "scale", Vector2(1.16, 1.16), 0.18)
-	tween.tween_property(goblin, "scale", Vector2.ONE, 0.18)
-	await tween.finished
-	goblin.modulate = Color.WHITE
-	if ResourceLoader.exists(goblin_animation_paths[0]):
-		goblin.texture = load(goblin_animation_paths[0])
+	awaiting_answer = true
+	roll_button.disabled = true
+	battle_overlay.visible = true
+	battle_hero.texture = load(HERO_IDLE % 1) if ResourceLoader.exists(HERO_IDLE % 1) else hero.texture
+	battle_monster.texture = load(GOBLIN_IDLE) if ResourceLoader.exists(GOBLIN_IDLE) else goblin.texture
+	battle_title.text = "GOBLIN BATTLE — TILE %d" % (step + 1)
+	battle_log.text = "A goblin blocks your path!"
+	await get_tree().create_timer(0.45).timeout
+	for round_index in range(3):
+		battle_log.text = "Round %d: The hero attacks!" % (round_index + 1)
+		var hero_start := battle_hero.position
+		var dash := create_tween()
+		dash.tween_property(battle_hero, "position:x", hero_start.x + 34, 0.14)
+		dash.tween_property(battle_hero, "position:x", hero_start.x, 0.14)
+		dash.parallel().tween_property(battle_monster, "modulate", Color("#ff7777"), 0.12)
+		dash.tween_property(battle_monster, "modulate", Color.WHITE, 0.16)
+		dash.parallel().tween_property(battle_monster, "scale", Vector2(0.88, 0.88), 0.12)
+		dash.tween_property(battle_monster, "scale", Vector2.ONE, 0.16)
+		await dash.finished
+		battle_log.text = "The goblin strikes back!"
+		var monster_tween := create_tween()
+		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x - 26, 0.12)
+		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x, 0.12)
+		monster_tween.parallel().tween_property(battle_hero, "modulate", Color("#ffb0a5"), 0.12)
+		monster_tween.tween_property(battle_hero, "modulate", Color.WHITE, 0.16)
+		await monster_tween.finished
+	battle_title.text = "GOBLIN DEFEATED!"
+	battle_log.text = "Victory! You can continue your journey."
+	var victory := create_tween()
+	victory.tween_property(battle_monster, "scale", Vector2(0.1, 0.1), 0.35)
+	victory.parallel().tween_property(battle_monster, "modulate:a", 0.0, 0.35)
+	await victory.finished
+	await get_tree().create_timer(0.8).timeout
+	battle_overlay.visible = false
+	battle_monster.scale = Vector2.ONE
+	battle_monster.modulate = Color.WHITE
+	battle_monster.position = Vector2.ZERO
+	battle_hero.modulate = Color.WHITE
+	awaiting_answer = false
 	roll_button.disabled = false
+	_set_status("Victory on tile %d! Roll again to continue." % (step + 1))
 
 func _finish_quest() -> void:
 	roll_button.disabled = true

@@ -272,9 +272,5 @@ func _on_next_pressed() -> void:
 		page_index += 1
 		_show_page()
 	else:
-		title_label.text = "STAGE 1: THE SLIME KING"
-		story_label.text = "The story introduction is complete. Next, connect this button to the playable board scene."
-		next_button.text = "Intro Complete"
-		next_button.disabled = true
-		back_button.disabled = true
-		page_label.text = "READY"
+		page_index = 0
+		_show_page()

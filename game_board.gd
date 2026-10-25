@@ -111,18 +111,31 @@ func _build_ui() -> void:
 	board_col.add_child(path_grid)
 	for i in range(24):
 		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(60, 54)
+		tile.custom_minimum_size = Vector2(78, 72)
 		tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
+		var tile_content := VBoxContainer.new()
+		tile_content.add_theme_constant_override("separation", 0)
+		tile_content.alignment = BoxContainer.ALIGNMENT_CENTER
+		tile.add_child(tile_content)
+		var icon := TextureRect.new()
+		icon.name = "TileIcon"
+		icon.custom_minimum_size = Vector2(30, 30)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile_content.add_child(icon)
 		var label := Label.new()
+		label.name = "TileLabel"
 		label.text = str(i + 1)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 18)
-		tile.add_child(label)
+		label.add_theme_font_size_override("font_size", 13)
+		tile_content.add_child(label)
 		path_grid.add_child(tile)
 		spaces.append(tile)
 	var hint := Label.new()
-	hint.text = "Blue: your position   •   Gold: quiz tile   •   Red: monster tile"
+	hint.text = "Icons: start, quiz scrolls, goblins, treasure, potions, and the final boss"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_color_override("font_color", Color("#e2e8f0"))
 	board_col.add_child(hint)
@@ -212,23 +225,41 @@ func _panel_style(fill: String, edge: String) -> StyleBoxFlat:
 func _update_board() -> void:
 	for i in range(spaces.size()):
 		var tile := spaces[i]
-		var label := tile.get_child(0) as Label
+		var content := tile.get_child(0) as VBoxContainer
+		var icon := content.get_node("TileIcon") as TextureRect
+		var label := content.get_node("TileLabel") as Label
+		var icon_name := "empty"
+		if i == 0:
+			icon_name = "start"
+		elif i == 23:
+			icon_name = "boss"
+		elif i % 5 == 3:
+			icon_name = "goblin"
+		elif i % 4 == 2:
+			icon_name = "scroll"
+		elif i % 7 == 5:
+			icon_name = "chest"
+		elif i % 6 == 4:
+			icon_name = "potion"
+		var icon_path := "res://Dungeon_Tiles_and_Dice/tiles/128/%s.png" % icon_name
+		if ResourceLoader.exists(icon_path):
+			icon.texture = load(icon_path)
+		else:
+			icon.texture = null
+		label.text = "YOU" if i == step else str(i + 1)
+		label.add_theme_color_override("font_color", Color.WHITE if i == step else Color("#e2e8f0"))
 		if i == step:
 			tile.add_theme_stylebox_override("panel", _panel_style("#2878b8", "#ffffff"))
-			label.text = "HERO"
-			label.add_theme_color_override("font_color", Color.WHITE)
+			tile.scale = Vector2(1.06, 1.06)
 		elif i % 5 == 3:
 			tile.add_theme_stylebox_override("panel", _panel_style("#713c42", "#dc8b7f"))
-			label.text = "M"
-			label.add_theme_color_override("font_color", Color.WHITE)
+			tile.scale = Vector2.ONE
 		elif i % 4 == 2:
 			tile.add_theme_stylebox_override("panel", _panel_style("#715d2c", "#f5d58a"))
-			label.text = "?"
-			label.add_theme_color_override("font_color", Color.WHITE)
+			tile.scale = Vector2.ONE
 		else:
 			tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
-			label.text = str(i + 1)
-			label.add_theme_color_override("font_color", Color("#e2e8f0"))
+			tile.scale = Vector2.ONE
 	var info := find_child("StepInfo", true, false) as Label
 	if info:
 		info.text = "Trail progress: %d / 24" % step

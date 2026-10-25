@@ -4,11 +4,23 @@ const HERO_IDLE := "res://hero_pack/hero/frames/idle/hero_idle_%02d.png"
 const HERO_WALK := "res://hero_pack/hero/frames/walk/hero_walk_%02d.png"
 const GOBLIN_IDLE := "res://Godot_Monster_Assets/monsters/goblin/frames/goblin_idle.png"
 const QUESTIONS := [
-	{"q":"Which command retrieves data from a database?","answers":["SELECT","DELETE","DROP"],"correct":0},
-	{"q":"Which part of a computer runs program instructions?","answers":["Monitor","CPU","Keyboard"],"correct":1},
-	{"q":"What does HTML mainly structure?","answers":["Web pages","Databases","Networks"],"correct":0},
-	{"q":"Which one is an input device?","answers":["Speaker","Monitor","Keyboard"],"correct":2},
-	{"q":"Which symbol commonly ends a SQL statement?","answers":[";","?","@"],"correct":0}
+	{"subject":"Tech","difficulty":1,"q":"Which command retrieves data from a database?","answers":["SELECT","DELETE","DROP"],"correct":0},
+	{"subject":"Tech","difficulty":1,"q":"Which part of a computer runs program instructions?","answers":["Monitor","CPU","Keyboard"],"correct":1},
+	{"subject":"Tech","difficulty":2,"q":"What does HTML mainly structure?","answers":["Web pages","Databases","Networks"],"correct":0},
+	{"subject":"Tech","difficulty":1,"q":"Which one is an input device?","answers":["Speaker","Monitor","Keyboard"],"correct":2},
+	{"subject":"Tech","difficulty":2,"q":"Which symbol commonly ends a SQL statement?","answers":[";","?","@"],"correct":0},
+	{"subject":"Science","difficulty":1,"q":"Which planet is closest to the Sun?","answers":["Mercury","Earth","Mars"],"correct":0},
+	{"subject":"Science","difficulty":2,"q":"What gas do plants absorb for photosynthesis?","answers":["Carbon dioxide","Oxygen","Helium"],"correct":0},
+	{"subject":"Science","difficulty":3,"q":"What is the chemical symbol for gold?","answers":["Au","Ag","Gd"],"correct":0},
+	{"subject":"Math","difficulty":1,"q":"What is 9 × 6?","answers":["54","56","63"],"correct":0},
+	{"subject":"Math","difficulty":2,"q":"What is 15% of 200?","answers":["30","15","20"],"correct":0},
+	{"subject":"Math","difficulty":3,"q":"Solve: 3x + 7 = 31. What is x?","answers":["8","6","10"],"correct":0},
+	{"subject":"English","difficulty":1,"q":"What is the plural of child?","answers":["Children","Childs","Childrens"],"correct":0},
+	{"subject":"English","difficulty":2,"q":"Which word is an adverb?","answers":["Slowly","Teacher","Beautiful"],"correct":0},
+	{"subject":"English","difficulty":3,"q":"Choose the correct word: They left ___ bags at home.","answers":["their","there","they're"],"correct":0},
+	{"subject":"World","difficulty":1,"q":"What is the capital of Japan?","answers":["Tokyo","Seoul","Beijing"],"correct":0},
+	{"subject":"World","difficulty":2,"q":"In what year did World War II end?","answers":["1945","1939","1950"],"correct":0},
+	{"subject":"World","difficulty":3,"q":"Which line divides Earth into Northern and Southern Hemispheres?","answers":["Equator","Prime Meridian","Tropic of Cancer"],"correct":0}
 ]
 
 var step := 0
@@ -47,12 +59,30 @@ var goblin_max_hp := 48
 var goblin_hp := 48
 var goblin_attack := 12
 var goblin_defense := 3
+var stage := 1
+var stage_count := 5
+var endless_mode := false
+var tile_events: Array[String] = []
+var experience := 0
+var hero_level := 1
+var win_streak := 0
+var fifty_fifty_charges := 1
+var questions_right: Dictionary = {}
+var questions_seen: Dictionary = {}
+var missed_questions: Array[Dictionary] = []
+var stage_snapshot: Dictionary = {}
+var boss_shield_bonus := 0
+var current_battle_is_boss := false
+var question_timer_id := 0
+var question_timer_label: Label
+var question_help_button: Button
 
 func _ready() -> void:
 	rng.randomize()
 	_build_ui()
+	_start_stage(false)
 	_update_board()
-	_set_status("Your quest begins! Roll the dice to travel toward the dungeon.")
+	_set_status("Stage 1 begins! Roll the dice and grow stronger through quizzes and battles.")
 	_start_background_motion()
 	_build_battle_overlay()
 
@@ -151,7 +181,7 @@ func _build_ui() -> void:
 		path_grid.add_child(tile)
 		spaces.append(tile)
 	var hint := Label.new()
-	hint.text = "Icons: start, quiz scrolls, goblins, treasure, potions, and the final boss"
+	hint.text = "Fight • Heal • Quiz Chest • Trap • Lucky • Skip • Boss"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint.add_theme_color_override("font_color", Color("#e2e8f0"))
 	board_col.add_child(hint)
@@ -244,25 +274,83 @@ func _panel_style(fill: String, edge: String) -> StyleBoxFlat:
 	style.content_margin_bottom = 6
 	return style
 
+func _start_stage(restore_snapshot: bool) -> void:
+	step = 0
+	var tile_count := mini(24 + (stage - 1) * 4, 40)
+	tile_events.clear()
+	tile_events.append("start")
+	for i in range(1, tile_count - 1):
+		var roll := rng.randf()
+		var event := "empty"
+		if roll < minf(0.25 + stage * 0.025, 0.42):
+			event = "fight"
+		elif roll < 0.25 + stage * 0.025 + 0.15:
+			event = "heal"
+		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20:
+			event = "chest"
+		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08:
+			event = "trap"
+		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08 + 0.10:
+			event = "lucky"
+		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08 + 0.10 + 0.05:
+			event = "skip"
+		tile_events.append(event)
+	tile_events.append("boss")
+	_rebuild_tiles(tile_count)
+	stage_snapshot = {
+		"hp": hero_hp, "max_hp": hero_max_hp, "attack": hero_attack, "defense": hero_defense,
+		"level": hero_level, "exp": experience, "helper": fifty_fifty_charges, "streak": win_streak
+	}
+	if restore_snapshot:
+		hero_hp = int(stage_snapshot.hp)
+		hero_max_hp = int(stage_snapshot.max_hp)
+		hero_attack = int(stage_snapshot.attack)
+		hero_defense = int(stage_snapshot.defense)
+		hero_level = int(stage_snapshot.level)
+		experience = int(stage_snapshot.exp)
+		fifty_fifty_charges = int(stage_snapshot.helper)
+		win_streak = int(stage_snapshot.streak)
+
+func _rebuild_tiles(count: int) -> void:
+	while spaces.size() > count:
+		var old_tile = spaces.pop_back()
+		old_tile.queue_free()
+	while spaces.size() < count:
+		var i := spaces.size()
+		var tile := PanelContainer.new()
+		tile.custom_minimum_size = Vector2(78, 72)
+		tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
+		var tile_content := VBoxContainer.new()
+		tile_content.add_theme_constant_override("separation", 0)
+		tile_content.alignment = BoxContainer.ALIGNMENT_CENTER
+		tile.add_child(tile_content)
+		var icon := TextureRect.new()
+		icon.name = "TileIcon"
+		icon.custom_minimum_size = Vector2(30, 30)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile_content.add_child(icon)
+		var label := Label.new()
+		label.name = "TileLabel"
+		label.text = str(i + 1)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size", 13)
+		tile_content.add_child(label)
+		path_grid.add_child(tile)
+		spaces.append(tile)
+
 func _update_board() -> void:
 	for i in range(spaces.size()):
 		var tile := spaces[i]
 		var content := tile.get_child(0) as VBoxContainer
 		var icon := content.get_node("TileIcon") as TextureRect
 		var label := content.get_node("TileLabel") as Label
-		var icon_name := "empty"
-		if i == 0:
-			icon_name = "start"
-		elif i == 23:
-			icon_name = "boss"
-		elif i % 5 == 3:
-			icon_name = "goblin"
-		elif i % 4 == 2:
-			icon_name = "scroll"
-		elif i % 7 == 5:
-			icon_name = "chest"
-		elif i % 6 == 4:
-			icon_name = "potion"
+		var event_name: String = tile_events[i] if i < tile_events.size() else "empty"
+		var icon_map := {"start":"start","boss":"boss","fight":"goblin","chest":"scroll","heal":"potion","trap":"empty","lucky":"chest","skip":"scroll","empty":"empty"}
+		var icon_name: String = icon_map.get(event_name, "empty")
 		var icon_path := "res://Dungeon_Tiles_and_Dice/tiles/128/%s.png" % icon_name
 		if ResourceLoader.exists(icon_path):
 			icon.texture = load(icon_path)
@@ -273,18 +361,21 @@ func _update_board() -> void:
 		if i == step:
 			tile.add_theme_stylebox_override("panel", _panel_style("#2878b8", "#ffffff"))
 			tile.scale = Vector2(1.06, 1.06)
-		elif i % 5 == 3:
+		elif event_name == "fight" or event_name == "boss":
 			tile.add_theme_stylebox_override("panel", _panel_style("#713c42", "#dc8b7f"))
 			tile.scale = Vector2.ONE
-		elif i % 4 == 2:
+		elif event_name == "chest" or event_name == "lucky":
 			tile.add_theme_stylebox_override("panel", _panel_style("#715d2c", "#f5d58a"))
+			tile.scale = Vector2.ONE
+		elif event_name == "heal":
+			tile.add_theme_stylebox_override("panel", _panel_style("#235c48", "#7dffb0"))
 			tile.scale = Vector2.ONE
 		else:
 			tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
 			tile.scale = Vector2.ONE
 	var info := find_child("StepInfo", true, false) as Label
 	if info:
-		info.text = "Trail progress: %d / 24" % step
+		info.text = "Stage %d • Trail: %d / %d" % [stage, step, maxi(1, spaces.size() - 1)]
 
 func _set_status(message: String) -> void:
 	status_label.text = message
@@ -312,7 +403,7 @@ func _start_goblin_animation() -> void:
 func _on_roll_pressed() -> void:
 	if rolling or awaiting_answer:
 		return
-	if step >= 23:
+	if step >= spaces.size() - 1:
 		_finish_quest()
 		return
 	rolling = true
@@ -329,22 +420,147 @@ func _on_roll_pressed() -> void:
 	var settle := create_tween()
 	settle.tween_property(dice_label, "scale", Vector2(1.22, 1.22), 0.12)
 	settle.tween_property(dice_label, "scale", original_scale, 0.15)
-	var target := mini(step + roll, 23)
+	var target := mini(step + roll, spaces.size() - 1)
 	await _move_hero(target)
 	step = target
 	_update_board()
 	rolling = false
-	if step >= 23:
-		_set_status("You reached the dungeon gate! Roll again to complete the rescue.")
-		roll_button.text = "COMPLETE QUEST"
-		roll_button.disabled = false
-	elif step % 5 == 3:
-		_show_monster_encounter()
-	elif step % 4 == 2:
-		_show_question()
+	_land_on_tile()
+
+func _land_on_tile() -> void:
+	var event_name: String = tile_events[step] if step < tile_events.size() else "empty"
+	match event_name:
+		"fight":
+			_show_monster_encounter(false)
+		"boss":
+			_show_boss_question()
+		"heal":
+			var heal_amount := 12 + stage * 4
+			hero_hp = mini(hero_max_hp, hero_hp + heal_amount)
+			_update_hero_stats()
+			tile_events[step] = "empty"
+			_update_board()
+			_set_status("Healing spring! Restored %d HP." % heal_amount)
+			roll_button.disabled = false
+		"chest":
+			_show_question("chest")
+		"trap":
+			var trap_damage := 7 + stage * 3
+			hero_hp = maxi(1, hero_hp - trap_damage)
+			win_streak = 0
+			tile_events[step] = "empty"
+			_update_hero_stats()
+			_update_board()
+			_set_status("Trap! Lost %d HP, but you survive." % trap_damage)
+			roll_button.disabled = false
+		"lucky":
+			var bonus := rng.randi_range(0, 2)
+			if bonus == 0:
+				hero_attack += 1
+			elif bonus == 1:
+				hero_defense += 1
+			else:
+				hero_max_hp += 8
+				hero_hp = mini(hero_max_hp, hero_hp + 8)
+			tile_events[step] = "empty"
+			_update_hero_stats()
+			_update_board()
+			_set_status("Lucky tile! " + ["ATK +1","DEF +1","Max HP +8"][bonus])
+			roll_button.disabled = false
+		"skip":
+			tile_events[step] = "empty"
+			_set_status("A wind boost! Moving 3 extra tiles.")
+			roll_button.disabled = true
+			await get_tree().create_timer(0.3).timeout
+			var skip_target := mini(step + 3, spaces.size() - 1)
+			await _move_hero(skip_target)
+			step = skip_target
+			_update_board()
+			_land_on_tile()
+		_:
+			_set_status("The path is clear. Roll again!")
+			roll_button.disabled = false
+
+func _exp_needed() -> int:
+	return hero_level * 30
+
+func _record_answer(question: Dictionary, correct: bool) -> void:
+	var subject := str(question.subject)
+	questions_seen[subject] = int(questions_seen.get(subject, 0)) + 1
+	if correct:
+		questions_right[subject] = int(questions_right.get(subject, 0)) + 1
 	else:
-		_set_status("The path is clear. Keep moving toward the dungeon!")
-		roll_button.disabled = false
+		missed_questions.append({"subject": subject, "question": question.q, "answer": question.answers[int(question.correct)]})
+
+func _show_boss_question() -> void:
+	var question: Dictionary = _get_question(true)
+	awaiting_answer = true
+	roll_button.disabled = true
+	boss_shield_bonus = 0
+	for child in answer_box.get_children():
+		child.queue_free()
+	question_timer_id += 1
+	var this_timer := question_timer_id
+	_set_status("BOSS SHIELD: answer correctly to break it!")
+	var prompt := Label.new()
+	prompt.text = "Stage %d Boss Shield\n%s: %s" % [stage, question.subject, question.q]
+	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	answer_box.add_child(prompt)
+	var order: Array[int] = [0, 1, 2]
+	order.shuffle()
+	for answer_index in order:
+		var answer_button := Button.new()
+		answer_button.text = str(question.answers[answer_index])
+		answer_button.pressed.connect(func():
+			if not awaiting_answer or this_timer != question_timer_id:
+				return
+			awaiting_answer = false
+			_record_answer(question, answer_index == int(question.correct))
+			if answer_index == int(question.correct):
+				win_streak += 1
+				boss_shield_bonus = 0
+				_set_status("Correct! The boss shield is broken.")
+			else:
+				win_streak = 0
+				boss_shield_bonus = 5 + stage
+				_set_status("Wrong! The boss gains extra defense. Answer: " + str(question.answers[int(question.correct)]))
+			_clear_answer_box()
+			_show_monster_encounter(true)
+		)
+		answer_box.add_child(answer_button)
+	answer_box.visible = true
+	if fifty_fifty_charges > 0:
+		var helper := Button.new()
+		helper.text = "50/50 (%d left)" % fifty_fifty_charges
+		helper.pressed.connect(func():
+			if not awaiting_answer or this_timer != question_timer_id:
+				return
+			var wrong_buttons: Array[Button] = []
+			for child in answer_box.get_children():
+				if child is Button and child.text != str(question.answers[int(question.correct)]) and child != helper:
+					wrong_buttons.append(child)
+			if wrong_buttons.size() > 0:
+				wrong_buttons[rng.randi_range(0, wrong_buttons.size() - 1)].disabled = true
+				fifty_fifty_charges -= 1
+				helper.disabled = true
+				_update_hero_stats()
+		)
+		answer_box.add_child(helper)
+
+func _get_question(harder: bool = false) -> Dictionary:
+	var allowed: Array[Dictionary] = []
+	var target_difficulty := mini(3, 1 + int((stage - 1) / 2) + (1 if harder else 0))
+	for question in QUESTIONS:
+		if int(question.difficulty) <= target_difficulty:
+			allowed.append(question)
+	if allowed.is_empty():
+		return QUESTIONS[rng.randi_range(0, QUESTIONS.size() - 1)]
+	return allowed[rng.randi_range(0, allowed.size() - 1)]
+
+func _clear_answer_box() -> void:
+	for child in answer_box.get_children():
+		child.queue_free()
+	answer_box.visible = false
 
 func _move_hero(target: int) -> void:
 	hero_animating = true
@@ -355,34 +571,177 @@ func _move_hero(target: int) -> void:
 	_set_hero_frame(1)
 	hero_animating = false
 
-func _show_question() -> void:
+func _show_question(kind: String = "chest") -> void:
 	awaiting_answer = true
 	roll_button.disabled = true
-	var question: Dictionary = QUESTIONS[question_index % QUESTIONS.size()]
+	var question: Dictionary = _get_question(false)
 	question_index += 1
-	_set_status("QUIZ CHALLENGE: " + str(question.q))
-	for child in answer_box.get_children():
-		child.queue_free()
-	for i in range(question.answers.size()):
-		var answer := Button.new()
-		answer.text = str(question.answers[i])
-		answer.pressed.connect(_on_answer_selected.bind(i, int(question.correct)))
-		answer_box.add_child(answer)
+	question_timer_id += 1
+	var this_timer := question_timer_id
+	_set_status("QUIZ CHEST: correct answers make your hero stronger!")
+	_clear_answer_box()
+	var prompt := Label.new()
+	prompt.text = "%s • %s\n%s" % [question.subject, "Hard" if int(question.difficulty) >= 3 else "Question", question.q]
+	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	answer_box.add_child(prompt)
+	var order: Array[int] = [0, 1, 2]
+	order.shuffle()
+	for answer_index in order:
+		var answer_button := Button.new()
+		answer_button.text = str(question.answers[answer_index])
+		answer_button.pressed.connect(func():
+			if not awaiting_answer or this_timer != question_timer_id:
+				return
+			awaiting_answer = false
+			var is_correct := answer_index == int(question.correct)
+			_record_answer(question, is_correct)
+			_clear_answer_box()
+			if is_correct:
+				win_streak += 1
+				experience += 8 + int(question.difficulty) * 4
+				var bonus_text := ""
+				if win_streak > 0 and win_streak % 3 == 0:
+					hero_max_hp += 5
+					hero_hp += 5
+					bonus_text = " Streak bonus: Max HP +5!"
+				var reward_kind := rng.randi_range(0, 3)
+				match reward_kind:
+					0:
+						hero_attack += 1
+						bonus_text += " ATK +1."
+					1:
+						hero_defense += 1
+						bonus_text += " DEF +1."
+					2:
+						hero_hp = mini(hero_max_hp, hero_hp + 15)
+						bonus_text += " Healed 15 HP."
+					_:
+						hero_max_hp += 5
+						hero_hp += 5
+						bonus_text += " Max HP +5."
+				_set_status("Correct! You got stronger.%s" % bonus_text)
+				_flash_feedback(Color("#7dffb0"))
+				tile_events[step] = "empty"
+				_update_hero_stats()
+				_update_board()
+				_check_level_up()
+			else:
+				win_streak = 0
+				hero_hp = maxi(1, hero_hp - (5 + stage * 2))
+				_set_status("Wrong! Lost HP. Correct answer: %s" % str(question.answers[int(question.correct)]))
+				_flash_feedback(Color("#ff8c8c"))
+				tile_events[step] = "empty"
+				_update_hero_stats()
+				_update_board()
+				roll_button.disabled = false
+		)
+		answer_box.add_child(answer_button)
+	answer_box.visible = true
+	if fifty_fifty_charges > 0:
+		var helper := Button.new()
+		helper.text = "50/50 (%d left)" % fifty_fifty_charges
+		helper.pressed.connect(func():
+			if not awaiting_answer or this_timer != question_timer_id:
+				return
+			var wrong_buttons: Array[Button] = []
+			for child in answer_box.get_children():
+				if child is Button and child != helper and child.text != str(question.answers[int(question.correct)]):
+					wrong_buttons.append(child)
+			if wrong_buttons.size() > 0:
+				wrong_buttons[rng.randi_range(0, wrong_buttons.size() - 1)].disabled = true
+				fifty_fifty_charges -= 1
+				helper.disabled = true
+				_update_hero_stats()
+		)
+		answer_box.add_child(helper)
+	if int(question.difficulty) >= 3:
+		var time_left := 15
+		var timer_label := Label.new()
+		timer_label.text = "Time left: 15s"
+		answer_box.add_child(timer_label)
+		while time_left > 0 and awaiting_answer and this_timer == question_timer_id:
+			await get_tree().create_timer(1.0).timeout
+			time_left -= 1
+			if is_instance_valid(timer_label):
+				timer_label.text = "Time left: %ds" % time_left
+		if time_left <= 0 and awaiting_answer and this_timer == question_timer_id:
+			awaiting_answer = false
+			_record_answer(question, false)
+			win_streak = 0
+			hero_hp = maxi(1, hero_hp - (5 + stage * 2))
+			_clear_answer_box()
+			_update_hero_stats()
+			_set_status("Time's up! Lost HP. Answer: %s" % str(question.answers[int(question.correct)]))
+			roll_button.disabled = false
+
+func _check_level_up() -> void:
+	if experience < _exp_needed():
+		roll_button.disabled = false
+		return
+	experience -= _exp_needed()
+	hero_level += 1
+	awaiting_answer = true
+	roll_button.disabled = true
+	_set_status("LEVEL UP! Answer a question to choose a reward.")
+	var question: Dictionary = _get_question(true)
+	_clear_answer_box()
+	var prompt := Label.new()
+	prompt.text = "Level %d: %s\n%s" % [hero_level, question.subject, question.q]
+	prompt.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	answer_box.add_child(prompt)
+	var order: Array[int] = [0, 1, 2]
+	order.shuffle()
+	for answer_index in order:
+		var b := Button.new()
+		b.text = str(question.answers[answer_index])
+		b.pressed.connect(func():
+			if not awaiting_answer:
+				return
+			awaiting_answer = false
+			var correct := answer_index == int(question.correct)
+			_record_answer(question, correct)
+			_clear_answer_box()
+			if correct:
+				win_streak += 1
+				_show_level_rewards()
+			else:
+				win_streak = 0
+				hero_hp = maxi(1, hero_hp - (8 + stage * 2))
+				_update_hero_stats()
+				_set_status("Level-up answer wrong. You lose HP and get no reward.")
+				roll_button.disabled = false
+		)
+		answer_box.add_child(b)
 	answer_box.visible = true
 
-func _on_answer_selected(selected: int, correct: int) -> void:
-	if not awaiting_answer:
-		return
-	awaiting_answer = false
-	for child in answer_box.get_children():
-		child.queue_free()
-	if selected == correct:
-		_set_status("Correct! You earned a rescue star. Roll to continue.")
-		_flash_feedback(Color("#7dffb0"))
-	else:
-		_set_status("Not quite! The goblin gets closer. Try the next challenge.")
-		_flash_feedback(Color("#ff8c8c"))
-	roll_button.disabled = false
+func _show_level_rewards() -> void:
+	awaiting_answer = true
+	_set_status("Correct! Choose one of two rewards.")
+	_clear_answer_box()
+	var rewards: Array[Dictionary] = [
+		{"name":"ATK +2","id":"atk"},{"name":"DEF +2","id":"def"},
+		{"name":"Heal 20 HP","id":"heal"},{"name":"Max HP +10","id":"max"}
+	]
+	rewards.shuffle()
+	for reward in rewards.slice(0, 2):
+		var b := Button.new()
+		b.text = str(reward.name)
+		b.pressed.connect(func():
+			match str(reward.id):
+				"atk": hero_attack += 2
+				"def": hero_defense += 2
+				"heal": hero_hp = mini(hero_max_hp, hero_hp + 20)
+				"max":
+					hero_max_hp += 10
+					hero_hp += 10
+			awaiting_answer = false
+			_clear_answer_box()
+			_update_hero_stats()
+			_set_status("Reward claimed! Keep going.")
+			roll_button.disabled = false
+		)
+		answer_box.add_child(b)
+	answer_box.visible = true
 
 func _flash_feedback(tint: Color) -> void:
 	var original := status_label.modulate
@@ -440,9 +799,10 @@ func _build_battle_overlay() -> void:
 	battle_stats_label.add_theme_color_override("font_color", Color("#e2e8f0"))
 	col.add_child(battle_stats_label)
 
-func _show_monster_encounter() -> void:
+func _show_monster_encounter(is_boss: bool = false) -> void:
 	awaiting_answer = true
 	roll_button.disabled = true
+	current_battle_is_boss = is_boss
 	battle_overlay.visible = true
 	battle_hero.texture = load(HERO_IDLE % 1) if ResourceLoader.exists(HERO_IDLE % 1) else hero.texture
 	battle_monster.texture = load(GOBLIN_IDLE) if ResourceLoader.exists(GOBLIN_IDLE) else goblin.texture
@@ -450,81 +810,167 @@ func _show_monster_encounter() -> void:
 	battle_monster.scale = Vector2.ONE
 	battle_hero.modulate = Color.WHITE
 	battle_monster.modulate = Color.WHITE
+	goblin_max_hp = (70 + stage * 22) if is_boss else (28 + stage * 12)
 	goblin_hp = goblin_max_hp
-	battle_title.text = "GOBLIN BATTLE — TILE %d" % (step + 1)
-	battle_log.text = "A goblin blocks your path!"
+	goblin_attack = (9 + stage * 4) if is_boss else (4 + stage * 2)
+	goblin_defense = (3 + stage * 2 + boss_shield_bonus) if is_boss else (1 + stage)
+	battle_title.text = ("STAGE %d BOSS" % stage) if is_boss else "MONSTER BATTLE"
+	battle_log.text = "A powerful enemy blocks your path!"
 	_update_battle_stats()
-	await get_tree().create_timer(0.6).timeout
+	await get_tree().create_timer(0.5).timeout
 	var round_index := 1
 	while hero_hp > 0 and goblin_hp > 0:
-		battle_log.text = "Round %d: The hero attacks!" % round_index
-		var hero_damage: int = maxi(1, hero_attack + rng.randi_range(-3, 4) - goblin_defense)
+		battle_log.text = "Round %d: Your hero attacks!" % round_index
+		var hero_damage: int = maxi(1, hero_attack - goblin_defense + rng.randi_range(-2, 2))
 		goblin_hp = maxi(0, goblin_hp - hero_damage)
 		_update_battle_stats()
 		var hero_start := battle_hero.position
 		var dash := create_tween()
-		dash.tween_property(battle_hero, "position:x", hero_start.x + 34, 0.14)
+		dash.tween_property(battle_hero, "position:x", hero_start.x + 28, 0.14)
 		dash.tween_property(battle_hero, "position:x", hero_start.x, 0.14)
 		dash.parallel().tween_property(battle_monster, "modulate", Color("#ff7777"), 0.12)
 		dash.tween_property(battle_monster, "modulate", Color.WHITE, 0.16)
-		dash.parallel().tween_property(battle_monster, "scale", Vector2(0.88, 0.88), 0.12)
-		dash.tween_property(battle_monster, "scale", Vector2.ONE, 0.16)
 		await dash.finished
-		battle_log.text = "Hero deals %d damage!" % hero_damage
-		await get_tree().create_timer(0.35).timeout
+		battle_log.text = "You dealt %d damage." % hero_damage
+		await get_tree().create_timer(0.25).timeout
 		if goblin_hp <= 0:
 			break
-		battle_log.text = "The goblin strikes back!"
-		var goblin_damage: int = maxi(1, goblin_attack + rng.randi_range(-2, 3) - hero_defense)
-		hero_hp = maxi(0, hero_hp - goblin_damage)
+		var enemy_damage: int = maxi(1, goblin_attack - hero_defense + rng.randi_range(-2, 2))
+		hero_hp = maxi(0, hero_hp - enemy_damage)
 		_update_hero_stats()
 		_update_battle_stats()
-		var monster_tween := create_tween()
-		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x - 26, 0.12)
-		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x, 0.12)
-		monster_tween.parallel().tween_property(battle_hero, "modulate", Color("#ffb0a5"), 0.12)
-		monster_tween.tween_property(battle_hero, "modulate", Color.WHITE, 0.16)
-		await monster_tween.finished
-		battle_log.text = "Goblin deals %d damage!" % goblin_damage
-		await get_tree().create_timer(0.45).timeout
+		battle_log.text = "Enemy dealt %d damage." % enemy_damage
+		var hit_tween := create_tween()
+		hit_tween.tween_property(battle_hero, "modulate", Color("#ffb0a5"), 0.12)
+		hit_tween.tween_property(battle_hero, "modulate", Color.WHITE, 0.16)
+		await hit_tween.finished
+		await get_tree().create_timer(0.3).timeout
 		round_index += 1
 	if goblin_hp <= 0:
-		battle_title.text = "GOBLIN DEFEATED!"
-		battle_log.text = "Victory! The path is clear."
+		battle_title.text = "VICTORY!"
+		battle_log.text = "You defeated the enemy!"
 		var victory := create_tween()
-		victory.tween_property(battle_monster, "scale", Vector2(0.1, 0.1), 0.35)
-		victory.parallel().tween_property(battle_monster, "modulate:a", 0.0, 0.35)
+		victory.tween_property(battle_monster, "scale", Vector2(0.1, 0.1), 0.3)
+		victory.parallel().tween_property(battle_monster, "modulate:a", 0.0, 0.3)
 		await victory.finished
 	else:
-		battle_title.text = "HERO NEEDS TO RECOVER"
-		battle_log.text = "You were overwhelmed! You recover with half HP and can try again."
-		hero_hp = maxi(1, int(ceil(hero_max_hp * 0.5)))
-		_update_hero_stats()
-	await get_tree().create_timer(1.0).timeout
+		battle_title.text = "DEFEATED"
+		battle_log.text = "Your stage run has ended."
+	await get_tree().create_timer(0.7).timeout
 	battle_overlay.visible = false
 	battle_monster.scale = Vector2.ONE
 	battle_monster.modulate = Color.WHITE
 	battle_monster.position = Vector2.ZERO
 	battle_hero.modulate = Color.WHITE
 	awaiting_answer = false
-	roll_button.disabled = false
 	if goblin_hp <= 0:
-		_set_status("Victory on tile %d! Roll again to continue." % (step + 1))
+		if is_boss:
+			_on_boss_defeated()
+		else:
+			experience += 15 + stage * 5
+			tile_events[step] = "empty"
+			_update_board()
+			_update_hero_stats()
+			_set_status("Monster defeated! +" + str(15 + stage * 5) + " EXP.")
+			roll_button.disabled = false
+			_check_level_up()
 	else:
-		_set_status("Recovering after the battle. Your HP is restored to %d." % hero_hp)
+		_show_retry_screen()
+
+func _show_retry_screen() -> void:
+	roll_button.disabled = true
+	awaiting_answer = true
+	_clear_answer_box()
+	var label := Label.new()
+	label.text = "You were defeated in Stage %d. Retry with your stats from the start of this stage?" % stage
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	answer_box.add_child(label)
+	var retry_button := Button.new()
+	retry_button.text = "Retry Stage"
+	retry_button.pressed.connect(func():
+		hero_hp = int(stage_snapshot.hp)
+		hero_max_hp = int(stage_snapshot.max_hp)
+		hero_attack = int(stage_snapshot.attack)
+		hero_defense = int(stage_snapshot.defense)
+		hero_level = int(stage_snapshot.level)
+		experience = int(stage_snapshot.exp)
+		fifty_fifty_charges = int(stage_snapshot.helper)
+		win_streak = int(stage_snapshot.streak)
+		_clear_answer_box()
+		awaiting_answer = false
+		_start_stage(false)
+		_update_board()
+		_update_hero_stats()
+		_set_status("Stage %d restarted. Your starting stats are restored." % stage)
+		roll_button.disabled = false
+	)
+	answer_box.add_child(retry_button)
+	answer_box.visible = true
+
+func _on_boss_defeated() -> void:
+	if stage >= stage_count and not endless_mode:
+		_show_study_summary(true)
+		return
+	stage += 1
+	hero_hp = hero_max_hp
+	experience = 0
+	hero_max_hp += 10 + stage * 2
+	hero_hp = hero_max_hp
+	_start_stage(false)
+	_update_board()
+	_update_hero_stats()
+	_set_status("Boss defeated! Stage %d begins. HP restored and Max HP increased." % stage)
+	roll_button.disabled = false
+
+func _show_study_summary(won: bool) -> void:
+	awaiting_answer = true
+	roll_button.disabled = true
+	_clear_answer_box()
+	var summary := Label.new()
+	summary.text = "QUEST COMPLETE! You defeated every boss.\nSTUDY SUMMARY"
+	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	answer_box.add_child(summary)
+	for subject in ["Science", "Math", "English", "World", "Tech"]:
+		var line := Label.new()
+		line.text = "%s: %d/%d correct" % [subject, int(questions_right.get(subject, 0)), int(questions_seen.get(subject, 0))]
+		answer_box.add_child(line)
+	for miss in missed_questions:
+		var line := Label.new()
+		line.text = "Missed (%s): %s → %s" % [miss.subject, miss.question, miss.answer]
+		line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		answer_box.add_child(line)
+	var endless_button := Button.new()
+	endless_button.text = "Endless Mode"
+	endless_button.pressed.connect(func():
+		endless_mode = true
+		stage += 1
+		hero_hp = hero_max_hp
+		experience = 0
+		_start_stage(false)
+		_clear_answer_box()
+		awaiting_answer = false
+		_update_board()
+		_update_hero_stats()
+		_set_status("Endless Mode! Stage %d." % stage)
+		roll_button.disabled = false
+	)
+	answer_box.add_child(endless_button)
+	var menu_button := Button.new()
+	menu_button.text = "Main Menu"
+	menu_button.pressed.connect(func(): get_tree().change_scene_to_file("res://main_menu.tscn"))
+	answer_box.add_child(menu_button)
+	answer_box.visible = true
 
 func _update_hero_stats() -> void:
 	if is_instance_valid(hero_stats_label):
-		hero_stats_label.text = "HP %d/%d   ATK %d   DEF %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense]
+		hero_stats_label.text = "HP %d/%d   ATK %d   DEF %d\nLV %d   EXP %d/%d   Streak %d   50/50: %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense, hero_level, experience, _exp_needed(), win_streak, fifty_fifty_charges]
 
 func _update_battle_stats() -> void:
 	if is_instance_valid(battle_stats_label):
 		battle_stats_label.text = "HERO  HP %d/%d  | ATK %d  | DEF %d\nGOBLIN  HP %d/%d  | ATK %d  | DEF %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense, goblin_hp, goblin_max_hp, goblin_attack, goblin_defense]
 
 func _finish_quest() -> void:
-	roll_button.disabled = true
-	_set_status("QUEST COMPLETE! You reached the dungeon and rescued the princess! 🎉")
-	roll_button.text = "QUEST COMPLETE"
-	var tween := create_tween()
-	tween.tween_property(hero, "scale", Vector2(1.18, 1.18), 0.25)
-	tween.tween_property(hero, "scale", Vector2.ONE, 0.25)
+	if step >= spaces.size() - 1:
+		_show_boss_question()
+	else:
+		roll_button.disabled = false

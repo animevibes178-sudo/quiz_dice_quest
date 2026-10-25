@@ -210,11 +210,18 @@ func _show_page() -> void:
 	_set_characters(page["characters"])
 
 
-func _set_background(keywords: Array) -> void:
-	var path := _find_art(keywords, ["environment", "background", "scene"])
-	if path.is_empty():
+func _set_background(_keywords: Array) -> void:
+	var background_paths: Array[String] = [
+		"res://Kingdom_Environments/Environments_1920x1080/02_Kingdom_Outside.png",
+		"res://Kingdom_Environments/Environments_1920x1080/07_Royal_Courtyard.png",
+		"res://goblin_kidnap/scene/goblin_kidnap_scene_1920x1080.png",
+		"res://Kingdom_Environments/Environments_1920x1080/05_Dungeon.png",
+		"res://Kingdom_Environments/Environments_1920x1080/01_Kingdom_Inside.png",
+		"res://Kingdom_Environments/Environments_1920x1080/04_Forest_Nature.png"
+	]
+	var path := background_paths[page_index]
+	if not ResourceLoader.exists(path):
 		background_rect.texture = null
-		background_rect.modulate = Color.WHITE
 		return
 	var resource := load(path)
 	if resource is Texture2D:

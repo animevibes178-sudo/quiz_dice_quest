@@ -281,18 +281,20 @@ func _start_stage(restore_snapshot: bool) -> void:
 	tile_events.append("start")
 	for i in range(1, tile_count - 1):
 		var roll := rng.randf()
+		var fight_chance := minf(0.22 + float(stage - 1) * 0.035, 0.42)
+		var heal_chance := maxf(0.16 - float(stage - 1) * 0.02, 0.06)
 		var event := "empty"
-		if roll < minf(0.25 + stage * 0.025, 0.42):
+		if roll < fight_chance:
 			event = "fight"
-		elif roll < 0.25 + stage * 0.025 + 0.15:
+		elif roll < fight_chance + heal_chance:
 			event = "heal"
-		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20:
+		elif roll < fight_chance + heal_chance + 0.18:
 			event = "chest"
-		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08:
+		elif roll < fight_chance + heal_chance + 0.18 + 0.10:
 			event = "trap"
-		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08 + 0.10:
+		elif roll < fight_chance + heal_chance + 0.18 + 0.10 + 0.10:
 			event = "lucky"
-		elif roll < 0.25 + stage * 0.025 + 0.15 + 0.20 + 0.08 + 0.10 + 0.05:
+		elif roll < fight_chance + heal_chance + 0.18 + 0.10 + 0.10 + 0.06:
 			event = "skip"
 		tile_events.append(event)
 	tile_events.append("boss")

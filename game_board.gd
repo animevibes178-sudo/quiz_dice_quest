@@ -524,7 +524,7 @@ func _show_boss_question() -> void:
 				_set_status("Correct! The boss shield is broken.")
 			else:
 				win_streak = 0
-				boss_shield_bonus = 5 + stage
+				boss_shield_bonus = 4
 				_set_status("Wrong! The boss gains extra defense. Answer: " + str(question.answers[int(question.correct)]))
 			_clear_answer_box()
 			_show_monster_encounter(true)
@@ -812,11 +812,14 @@ func _show_monster_encounter(is_boss: bool = false) -> void:
 	battle_monster.scale = Vector2.ONE
 	battle_hero.modulate = Color.WHITE
 	battle_monster.modulate = Color.WHITE
-	goblin_max_hp = (70 + stage * 22) if is_boss else (28 + stage * 12)
+	var monster_names := ["Goblin", "Bat", "Skeleton", "Slime", "Wolf"]
+	var boss_names := ["Slime King", "Stone Golem", "Shadow Witch", "Dragon Lord", "Ancient Titan"]
+	var monster_name := (boss_names[mini(stage - 1, 4)] if not endless_mode else "Endless Boss %d" % stage) if is_boss else monster_names[rng.randi_range(0, monster_names.size() - 1)]
+	goblin_max_hp = (100 + stage * 28) if is_boss else (18 + stage * 7)
 	goblin_hp = goblin_max_hp
-	goblin_attack = (9 + stage * 4) if is_boss else (4 + stage * 2)
-	goblin_defense = (3 + stage * 2 + boss_shield_bonus) if is_boss else (1 + stage)
-	battle_title.text = ("STAGE %d BOSS" % stage) if is_boss else "MONSTER BATTLE"
+	goblin_attack = (8 + stage * 3) if is_boss else (3 + stage * 2)
+	goblin_defense = (2 + stage * 2 + boss_shield_bonus) if is_boss else maxi(0, stage - 1)
+	battle_title.text = ("STAGE %d • %s" % [stage, monster_name]) if is_boss else monster_name.to_upper() + " BATTLE"
 	battle_log.text = "A powerful enemy blocks your path!"
 	_update_battle_stats()
 	await get_tree().create_timer(0.5).timeout
@@ -916,7 +919,7 @@ func _on_boss_defeated() -> void:
 	stage += 1
 	hero_hp = hero_max_hp
 	experience = 0
-	hero_max_hp += 10 + stage * 2
+	hero_max_hp += int(ceil(float(hero_max_hp) * rng.randf_range(0.10, 0.20)))
 	hero_hp = hero_max_hp
 	_start_stage(false)
 	_update_board()

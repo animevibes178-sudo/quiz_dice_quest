@@ -627,7 +627,7 @@ func _show_question(kind: String = "chest") -> void:
 				_check_level_up()
 			else:
 				win_streak = 0
-				hero_hp = maxi(1, hero_hp - (5 + stage * 2))
+				hero_hp = maxi(0, hero_hp - (5 + 5 * stage))
 				_set_status("Wrong! Lost HP. Correct answer: %s" % str(question.answers[int(question.correct)]))
 				_flash_feedback(Color("#ff8c8c"))
 				tile_events[step] = "empty"
@@ -706,7 +706,7 @@ func _check_level_up() -> void:
 				_show_level_rewards()
 			else:
 				win_streak = 0
-				hero_hp = maxi(1, hero_hp - (8 + stage * 2))
+				hero_hp = maxi(0, hero_hp - (5 + 5 * stage))
 				_update_hero_stats()
 				_set_status("Level-up answer wrong. You lose HP and get no reward.")
 				roll_button.disabled = false
@@ -821,7 +821,7 @@ func _show_monster_encounter(is_boss: bool = false) -> void:
 	var round_index := 1
 	while hero_hp > 0 and goblin_hp > 0:
 		battle_log.text = "Round %d: Your hero attacks!" % round_index
-		var hero_damage: int = maxi(1, hero_attack - goblin_defense + rng.randi_range(-2, 2))
+		var hero_damage: int = maxi(1, hero_attack - goblin_defense + rng.randi_range(-1, 1))
 		goblin_hp = maxi(0, goblin_hp - hero_damage)
 		_update_battle_stats()
 		var hero_start := battle_hero.position
@@ -835,7 +835,7 @@ func _show_monster_encounter(is_boss: bool = false) -> void:
 		await get_tree().create_timer(0.25).timeout
 		if goblin_hp <= 0:
 			break
-		var enemy_damage: int = maxi(1, goblin_attack - hero_defense + rng.randi_range(-2, 2))
+		var enemy_damage: int = maxi(1, goblin_attack - hero_defense + rng.randi_range(-1, 1))
 		hero_hp = maxi(0, hero_hp - enemy_damage)
 		_update_hero_stats()
 		_update_battle_stats()
@@ -867,11 +867,11 @@ func _show_monster_encounter(is_boss: bool = false) -> void:
 		if is_boss:
 			_on_boss_defeated()
 		else:
-			experience += 15 + stage * 5
+			experience += 20
 			tile_events[step] = "empty"
 			_update_board()
 			_update_hero_stats()
-			_set_status("Monster defeated! +" + str(15 + stage * 5) + " EXP.")
+			_set_status("Monster defeated! +20 EXP.")
 			roll_button.disabled = false
 			_check_level_up()
 	else:

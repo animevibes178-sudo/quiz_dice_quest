@@ -46,7 +46,7 @@ var shade: ColorRect
 var title_label: Label
 var story_label: Label
 var character_row: HBoxContainer
-var page_label: Label
+var skip_button: Button
 var next_button: Button
 var back_button: Button
 var textures_by_key: Dictionary = {}
@@ -174,11 +174,11 @@ func _build_interface() -> void:
 	back_button.pressed.connect(_on_back_pressed)
 	footer.add_child(back_button)
 
-	page_label = Label.new()
-	page_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	page_label.custom_minimum_size = Vector2(90, 0)
-	page_label.add_theme_color_override("font_color", Color("#e2e8f0"))
-	footer.add_child(page_label)
+	skip_button = Button.new()
+	skip_button.text = "Skip Intro"
+	skip_button.custom_minimum_size = Vector2(110, 38)
+	skip_button.pressed.connect(_on_skip_pressed)
+	footer.add_child(skip_button)
 
 	next_button = Button.new()
 	next_button.custom_minimum_size = Vector2(170, 38)
@@ -203,7 +203,7 @@ func _show_page() -> void:
 	var page: Dictionary = STORY_PAGES[page_index]
 	title_label.text = str(page["title"])
 	story_label.text = str(page["body"])
-	page_label.text = "%d / %d" % [page_index + 1, STORY_PAGES.size()]
+	skip_button.visible = page_index < STORY_PAGES.size() - 1
 	back_button.disabled = page_index == 0
 	next_button.text = "Begin Adventure" if page_index == STORY_PAGES.size() - 1 else "Continue"
 	_set_background(page["background"])
@@ -249,6 +249,7 @@ func _set_characters(character_specs: Array) -> void:
 		portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		character_row.add_child(portrait)
+		_animate_portrait(portrait, character_row.get_child_count())
 
 
 func _find_art(keywords: Array, preferred_path_words: Array) -> String:
@@ -290,3 +291,16 @@ func _on_next_pressed() -> void:
 	else:
 		page_index = 0
 		_show_page()
+
+
+func _animate_portrait(portrait: TextureRect, offset: int) -> void:
+	var base_y := portrait.position.y
+	var tween := create_tween().set_loops()
+	tween.tween_property(portrait, "position:y", base_y - 12, 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(portrait, "position:y", base_y, 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_interval(float(offset) * 0.08)
+
+
+func _on_skip_pressed() -> void:
+	page_index = STORY_PAGES.size() - 1
+	_show_page()

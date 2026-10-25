@@ -293,8 +293,7 @@ func _on_next_pressed() -> void:
 		page_index += 1
 		_show_page()
 	else:
-		page_index = 0
-		_show_page()
+		get_tree().change_scene_to_file("res://game_board.tscn")
 
 
 func _animate_portrait(portrait: TextureRect, offset: int) -> void:

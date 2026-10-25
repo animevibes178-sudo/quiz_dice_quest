@@ -58,6 +58,15 @@ func _ready() -> void:
 	_show_page()
 
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.keycode == KEY_RIGHT or event.keycode == KEY_ENTER or event.keycode == KEY_SPACE:
+		_on_next_pressed()
+	elif event.keycode == KEY_LEFT or event.keycode == KEY_BACKSPACE:
+		_on_back_pressed()
+
+
 func _scan_for_art(folder_path: String) -> void:
 	var directory := DirAccess.open(folder_path)
 	if directory == null:

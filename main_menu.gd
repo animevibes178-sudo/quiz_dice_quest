@@ -8,14 +8,38 @@ var music_toggle: CheckButton
 var fullscreen_toggle: CheckButton
 var volume_slider: HSlider
 var status_label: Label
+var menu_hero: TextureRect
+var title_label: Label
+var menu_card: PanelContainer
 
 func _ready() -> void:
 	_build_menu()
 	_load_settings()
+	_play_menu_animations()
+	_animate_menu_hero()
+
+func _play_menu_animations() -> void:
+	var intro := create_tween()
+	intro.set_parallel(true)
+	intro.tween_property(menu_card, "modulate:a", 1.0, 0.7).set_trans(Tween.TRANS_SINE)
+	intro.tween_property(menu_card, "position:y", menu_card.position.y - 28, 0.7).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var glow := create_tween().set_loops()
+	glow.tween_property(title_label, "modulate", Color("#ffe7a0"), 1.25).set_trans(Tween.TRANS_SINE)
+	glow.tween_property(title_label, "modulate", Color.WHITE, 1.25).set_trans(Tween.TRANS_SINE)
+
+func _animate_menu_hero() -> void:
+	var frame := 1
+	while is_instance_valid(menu_hero):
+		var path := "res://hero_pack/hero/frames/idle/hero_idle_%02d.png" % frame
+		if ResourceLoader.exists(path):
+			menu_hero.texture = load(path)
+		frame = (frame % 8) + 1
+		await get_tree().create_timer(0.14).timeout
 
 func _build_menu() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := TextureRect.new()
+	bg.name = "MenuBackground"
 	var bg_path := "res://Kingdom_Environments/Environments_1920x1080/01_Kingdom_Inside.png"
 	if ResourceLoader.exists(bg_path):
 		bg.texture = load(bg_path)
@@ -24,6 +48,10 @@ func _build_menu() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_child(bg)
+	bg.pivot_offset = Vector2(640, 360)
+	var bg_tween := create_tween().set_loops()
+	bg_tween.tween_property(bg, "scale", Vector2(1.035, 1.035), 5.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	bg_tween.tween_property(bg, "scale", Vector2.ONE, 5.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 
 	var shade := ColorRect.new()
 	shade.color = Color(0.025, 0.035, 0.08, 0.72)
@@ -35,7 +63,10 @@ func _build_menu() -> void:
 	add_child(center)
 
 	var card := PanelContainer.new()
+	menu_card = card
 	card.custom_minimum_size = Vector2(470, 0)
+	card.modulate.a = 0.0
+	card.position.y += 28
 	card.add_theme_stylebox_override("panel", _panel_style("#111b2de8", "#e8c879"))
 	center.add_child(card)
 
@@ -58,6 +89,7 @@ func _build_menu() -> void:
 	col.add_child(small_title)
 
 	var title := Label.new()
+	title_label = title
 	title.text = "QUIZ DICE QUEST"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 34)
@@ -70,6 +102,13 @@ func _build_menu() -> void:
 	subtitle.add_theme_font_size_override("font_size", 16)
 	subtitle.add_theme_color_override("font_color", Color("#f4d58d"))
 	col.add_child(subtitle)
+
+	menu_hero = TextureRect.new()
+	menu_hero.custom_minimum_size = Vector2(0, 118)
+	menu_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	menu_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	menu_hero.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	col.add_child(menu_hero)
 
 	var divider := HSeparator.new()
 	col.add_child(divider)
@@ -146,6 +185,15 @@ func _make_button(caption: String) -> Button:
 	button.add_theme_stylebox_override("normal", _panel_style("#263954", "#9db4d0"))
 	button.add_theme_stylebox_override("hover", _panel_style("#35577c", "#f4d58d"))
 	button.add_theme_stylebox_override("pressed", _panel_style("#17263b", "#f4d58d"))
+	button.pivot_offset = Vector2(200, 22)
+	button.mouse_entered.connect(func():
+		var tween := create_tween()
+		tween.tween_property(button, "scale", Vector2(1.025, 1.025), 0.12)
+	)
+	button.mouse_exited.connect(func():
+		var tween := create_tween()
+		tween.tween_property(button, "scale", Vector2.ONE, 0.12)
+	)
 	return button
 
 func _build_settings_panel() -> PanelContainer:

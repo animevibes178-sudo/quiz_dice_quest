@@ -244,12 +244,16 @@ func _set_characters(character_specs: Array) -> void:
 		portrait.texture = resource
 		portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-		portrait.custom_minimum_size = Vector2(150, 150)
+		portrait.custom_minimum_size = Vector2(180, 180)
 		portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		portrait.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		character_row.add_child(portrait)
-		_animate_portrait(portrait, character_row.get_child_count())
+		var frames := _animation_frames(keywords)
+		if frames.size() > 1:
+			_animate_texture_frames(portrait, frames)
+		else:
+			_animate_portrait(portrait, character_row.get_child_count())
 
 
 func _find_art(keywords: Array, preferred_path_words: Array) -> String:
@@ -299,6 +303,58 @@ func _animate_portrait(portrait: TextureRect, offset: int) -> void:
 	tween.tween_property(portrait, "position:y", base_y - 12, 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(portrait, "position:y", base_y, 0.65).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_interval(float(offset) * 0.08)
+
+
+func _on_skip_pressed() -> void:
+	page_index = STORY_PAGES.size() - 1
+	_show_page()
+
+
+func _animation_frames(keywords: Array) -> Array[String]:
+	var frames: Array[String] = []
+	var key := ""
+	for keyword in keywords:
+		key += str(keyword).to_lower() + " "
+	key = key.strip_edges()
+
+	if key.contains("goblin") and key.contains("carry"):
+		for i in range(1, 5):
+			frames.append("res://goblin_kidnap/sprites/frames/goblin_carry_princess_%02d.png" % i)
+	elif key.contains("princess") and key.contains("cry"):
+		for i in range(1, 5):
+			frames.append("res://goblin_kidnap/sprites/frames/princess_crying_%02d.png" % i)
+	elif key.contains("goblin") and key.contains("laugh"):
+		for i in range(1, 5):
+			frames.append("res://goblin_kidnap/sprites/frames/goblin_laughing_%02d.png" % i)
+	elif key.contains("king") and key.contains("talk"):
+		for i in range(1, 5):
+			frames.append("res://Godot_King_Assets/king/frames/king_talking_%02d.png" % i)
+	elif key.contains("king") and key.contains("idle"):
+		for i in range(1, 5):
+			frames.append("res://Godot_King_Assets/king/frames/king_idle_%02d.png" % i)
+	elif key.contains("hero") and key.contains("walk"):
+		for i in range(1, 9):
+			frames.append("res://hero_pack/hero/frames/walk/hero_walk_%02d.png" % i)
+	elif key.contains("hero") and key.contains("idle"):
+		for i in range(1, 9):
+			frames.append("res://hero_pack/hero/frames/idle/hero_idle_%02d.png" % i)
+
+	var valid_frames: Array[String] = []
+	for path in frames:
+		if ResourceLoader.exists(path):
+			valid_frames.append(path)
+	return valid_frames
+
+
+func _animate_texture_frames(portrait: TextureRect, frames: Array[String]) -> void:
+	while is_instance_valid(portrait):
+		for path in frames:
+			if not is_instance_valid(portrait):
+				return
+			var frame_texture := load(path)
+			if frame_texture is Texture2D:
+				portrait.texture = frame_texture
+			await get_tree().create_timer(0.16).timeout
 
 
 func _on_skip_pressed() -> void:

@@ -37,6 +37,16 @@ var battle_hero: TextureRect
 var battle_monster: TextureRect
 var battle_title: Label
 var battle_log: Label
+var hero_stats_label: Label
+var battle_stats_label: Label
+var hero_max_hp := 100
+var hero_hp := 100
+var hero_attack := 18
+var hero_defense := 6
+var goblin_max_hp := 48
+var goblin_hp := 48
+var goblin_attack := 12
+var goblin_defense := 3
 
 func _ready() -> void:
 	rng.randomize()
@@ -175,6 +185,12 @@ func _build_ui() -> void:
 	score.text = "Trail progress: 0 / 24"
 	score.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	side_col.add_child(score)
+	hero_stats_label = Label.new()
+	hero_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hero_stats_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hero_stats_label.add_theme_color_override("font_color", Color("#e2e8f0"))
+	side_col.add_child(hero_stats_label)
+	_update_hero_stats()
 	dice_label = Label.new()
 	dice_label.text = "🎲  ?"
 	dice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -418,6 +434,11 @@ func _build_battle_overlay() -> void:
 	battle_log.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	battle_log.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(battle_log)
+	battle_stats_label = Label.new()
+	battle_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	battle_stats_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	battle_stats_label.add_theme_color_override("font_color", Color("#e2e8f0"))
+	col.add_child(battle_stats_label)
 
 func _show_monster_encounter() -> void:
 	awaiting_answer = true
@@ -425,11 +446,21 @@ func _show_monster_encounter() -> void:
 	battle_overlay.visible = true
 	battle_hero.texture = load(HERO_IDLE % 1) if ResourceLoader.exists(HERO_IDLE % 1) else hero.texture
 	battle_monster.texture = load(GOBLIN_IDLE) if ResourceLoader.exists(GOBLIN_IDLE) else goblin.texture
+	battle_hero.scale = Vector2.ONE
+	battle_monster.scale = Vector2.ONE
+	battle_hero.modulate = Color.WHITE
+	battle_monster.modulate = Color.WHITE
+	goblin_hp = goblin_max_hp
 	battle_title.text = "GOBLIN BATTLE — TILE %d" % (step + 1)
 	battle_log.text = "A goblin blocks your path!"
-	await get_tree().create_timer(0.45).timeout
-	for round_index in range(3):
-		battle_log.text = "Round %d: The hero attacks!" % (round_index + 1)
+	_update_battle_stats()
+	await get_tree().create_timer(0.6).timeout
+	var round_index := 1
+	while hero_hp > 0 and goblin_hp > 0:
+		battle_log.text = "Round %d: The hero attacks!" % round_index
+		var hero_damage: int = maxi(1, hero_attack + rng.randi_range(-3, 4) - goblin_defense)
+		goblin_hp = maxi(0, goblin_hp - hero_damage)
+		_update_battle_stats()
 		var hero_start := battle_hero.position
 		var dash := create_tween()
 		dash.tween_property(battle_hero, "position:x", hero_start.x + 34, 0.14)
@@ -439,20 +470,37 @@ func _show_monster_encounter() -> void:
 		dash.parallel().tween_property(battle_monster, "scale", Vector2(0.88, 0.88), 0.12)
 		dash.tween_property(battle_monster, "scale", Vector2.ONE, 0.16)
 		await dash.finished
+		battle_log.text = "Hero deals %d damage!" % hero_damage
+		await get_tree().create_timer(0.35).timeout
+		if goblin_hp <= 0:
+			break
 		battle_log.text = "The goblin strikes back!"
+		var goblin_damage: int = maxi(1, goblin_attack + rng.randi_range(-2, 3) - hero_defense)
+		hero_hp = maxi(0, hero_hp - goblin_damage)
+		_update_hero_stats()
+		_update_battle_stats()
 		var monster_tween := create_tween()
 		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x - 26, 0.12)
 		monster_tween.tween_property(battle_monster, "position:x", battle_monster.position.x, 0.12)
 		monster_tween.parallel().tween_property(battle_hero, "modulate", Color("#ffb0a5"), 0.12)
 		monster_tween.tween_property(battle_hero, "modulate", Color.WHITE, 0.16)
 		await monster_tween.finished
-	battle_title.text = "GOBLIN DEFEATED!"
-	battle_log.text = "Victory! You can continue your journey."
-	var victory := create_tween()
-	victory.tween_property(battle_monster, "scale", Vector2(0.1, 0.1), 0.35)
-	victory.parallel().tween_property(battle_monster, "modulate:a", 0.0, 0.35)
-	await victory.finished
-	await get_tree().create_timer(0.8).timeout
+		battle_log.text = "Goblin deals %d damage!" % goblin_damage
+		await get_tree().create_timer(0.45).timeout
+		round_index += 1
+	if goblin_hp <= 0:
+		battle_title.text = "GOBLIN DEFEATED!"
+		battle_log.text = "Victory! The path is clear."
+		var victory := create_tween()
+		victory.tween_property(battle_monster, "scale", Vector2(0.1, 0.1), 0.35)
+		victory.parallel().tween_property(battle_monster, "modulate:a", 0.0, 0.35)
+		await victory.finished
+	else:
+		battle_title.text = "HERO NEEDS TO RECOVER"
+		battle_log.text = "You were overwhelmed! You recover with half HP and can try again."
+		hero_hp = maxi(1, int(ceil(hero_max_hp * 0.5)))
+		_update_hero_stats()
+	await get_tree().create_timer(1.0).timeout
 	battle_overlay.visible = false
 	battle_monster.scale = Vector2.ONE
 	battle_monster.modulate = Color.WHITE
@@ -460,7 +508,18 @@ func _show_monster_encounter() -> void:
 	battle_hero.modulate = Color.WHITE
 	awaiting_answer = false
 	roll_button.disabled = false
-	_set_status("Victory on tile %d! Roll again to continue." % (step + 1))
+	if goblin_hp <= 0:
+		_set_status("Victory on tile %d! Roll again to continue." % (step + 1))
+	else:
+		_set_status("Recovering after the battle. Your HP is restored to %d." % hero_hp)
+
+func _update_hero_stats() -> void:
+	if is_instance_valid(hero_stats_label):
+		hero_stats_label.text = "HP %d/%d   ATK %d   DEF %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense]
+
+func _update_battle_stats() -> void:
+	if is_instance_valid(battle_stats_label):
+		battle_stats_label.text = "HERO  HP %d/%d  | ATK %d  | DEF %d\nGOBLIN  HP %d/%d  | ATK %d  | DEF %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense, goblin_hp, goblin_max_hp, goblin_attack, goblin_defense]
 
 func _finish_quest() -> void:
 	roll_button.disabled = true

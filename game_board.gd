@@ -51,10 +51,10 @@ var battle_title: Label
 var battle_log: Label
 var hero_stats_label: Label
 var battle_stats_label: Label
-var hero_max_hp := 100
-var hero_hp := 100
-var hero_attack := 18
-var hero_defense := 6
+var hero_max_hp := 80
+var hero_hp := 80
+var hero_attack := 8
+var hero_defense := 2
 var goblin_max_hp := 48
 var goblin_hp := 48
 var goblin_attack := 12
@@ -276,7 +276,7 @@ func _panel_style(fill: String, edge: String) -> StyleBoxFlat:
 
 func _start_stage(restore_snapshot: bool) -> void:
 	step = 0
-	var tile_count := mini(24 + (stage - 1) * 4, 40)
+	var tile_count := mini(30 + (stage - 1) * 5, 50)
 	tile_events.clear()
 	tile_events.append("start")
 	for i in range(1, tile_count - 1):
@@ -482,7 +482,7 @@ func _land_on_tile() -> void:
 			roll_button.disabled = false
 
 func _exp_needed() -> int:
-	return hero_level * 30
+	return hero_level * 20
 
 func _record_answer(question: Dictionary, correct: bool) -> void:
 	var subject := str(question.subject)

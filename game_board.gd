@@ -4,7 +4,7 @@ const HERO_IDLE := "res://hero_pack/hero/frames/idle/hero_idle_%02d.png"
 const HERO_WALK := "res://hero_pack/hero/frames/walk/hero_walk_%02d.png"
 const GOBLIN_IDLE := "res://Godot_Monster_Assets/monsters/goblin/frames/goblin_idle.png"
 const QUESTIONS := [
-	{"subject":"Tech","difficulty":1,"q":"Which command retrieves data from a database?","answers":["SELECT","DELETE","DROP"],"correct":0},
+	{"subject":"Technology","difficulty":1,"q":"Which command retrieves data from a database?","answers":["SELECT","DELETE","DROP"],"correct":0},
 	{"subject":"Tech","difficulty":1,"q":"Which part of a computer runs program instructions?","answers":["Monitor","CPU","Keyboard"],"correct":1},
 	{"subject":"Tech","difficulty":2,"q":"What does HTML mainly structure?","answers":["Web pages","Databases","Networks"],"correct":0},
 	{"subject":"Tech","difficulty":1,"q":"Which one is an input device?","answers":["Speaker","Monitor","Keyboard"],"correct":2},
@@ -682,6 +682,8 @@ func _check_level_up() -> void:
 		return
 	experience -= _exp_needed()
 	hero_level += 1
+	if hero_level % 3 == 0:
+		fifty_fifty_charges += 1
 	awaiting_answer = true
 	roll_button.disabled = true
 	_set_status("LEVEL UP! Answer a question to choose a reward.")
@@ -721,8 +723,8 @@ func _show_level_rewards() -> void:
 	_set_status("Correct! Choose one of two rewards.")
 	_clear_answer_box()
 	var rewards: Array[Dictionary] = [
-		{"name":"ATK +2","id":"atk"},{"name":"DEF +2","id":"def"},
-		{"name":"Heal 20 HP","id":"heal"},{"name":"Max HP +10","id":"max"}
+		{"name":"ATK +%d" % rng.randi_range(2, 5),"id":"atk","amount":0},{"name":"DEF +%d" % rng.randi_range(1, 3),"id":"def","amount":0},
+		{"name":"Heal %d HP" % rng.randi_range(20, 40),"id":"heal","amount":0},{"name":"Max HP +%d%%" % rng.randi_range(10, 20),"id":"max","amount":0}
 	]
 	rewards.shuffle()
 	for reward in rewards.slice(0, 2):
@@ -730,12 +732,14 @@ func _show_level_rewards() -> void:
 		b.text = str(reward.name)
 		b.pressed.connect(func():
 			match str(reward.id):
-				"atk": hero_attack += 2
-				"def": hero_defense += 2
-				"heal": hero_hp = mini(hero_max_hp, hero_hp + 20)
+				"atk": hero_attack += int(str(reward.name).trim_prefix("ATK +"))
+				"def": hero_defense += int(str(reward.name).trim_prefix("DEF +"))
+				"heal": hero_hp = mini(hero_max_hp, hero_hp + int(str(reward.name).trim_prefix("Heal ").trim_suffix(" HP")))
 				"max":
-					hero_max_hp += 10
-					hero_hp += 10
+					var percent := int(str(reward.name).trim_prefix("Max HP +").trim_suffix("%"))
+					var increase := int(ceil(float(hero_max_hp) * float(percent) / 100.0))
+					hero_max_hp += increase
+					hero_hp = mini(hero_max_hp, hero_hp + increase)
 			awaiting_answer = false
 			_clear_answer_box()
 			_update_hero_stats()

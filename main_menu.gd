@@ -115,14 +115,14 @@ func _build_menu() -> void:
 	settings_panel.visible = false
 	add_child(settings_panel)
 	settings_panel.set_anchors_preset(Control.PRESET_CENTER)
-	settings_panel.position = Vector2(420, 210)
+	settings_panel.position = Vector2(-220, -150)
 	settings_panel.custom_minimum_size = Vector2(440, 300)
 
 	about_panel = _build_about_panel()
 	about_panel.visible = false
 	add_child(about_panel)
 	about_panel.set_anchors_preset(Control.PRESET_CENTER)
-	about_panel.position = Vector2(420, 220)
+	about_panel.position = Vector2(-220, -115)
 	about_panel.custom_minimum_size = Vector2(440, 230)
 
 func _panel_style(fill: String, edge: String) -> StyleBoxFlat:

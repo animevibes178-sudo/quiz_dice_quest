@@ -31,16 +31,19 @@ var roll_button: Button
 var answer_box: VBoxContainer
 var rng := RandomNumberGenerator.new()
 var spaces: Array[PanelContainer] = []
+var board_background: TextureRect
 
 func _ready() -> void:
 	rng.randomize()
 	_build_ui()
 	_update_board()
 	_set_status("Your quest begins! Roll the dice to travel toward the dungeon.")
+	_start_background_motion()
 
 func _build_ui() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var bg := TextureRect.new()
+	board_background = bg
 	bg.texture = load("res://Kingdom_Environments/Environments_1920x1080/04_Forest_Nature.png")
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
@@ -188,6 +191,12 @@ func _build_ui() -> void:
 	_start_idle_animation()
 	_start_goblin_animation()
 
+func _start_background_motion() -> void:
+	board_background.pivot_offset = Vector2(640, 360)
+	var tween := create_tween().set_loops()
+	tween.tween_property(board_background, "scale", Vector2(1.025, 1.025), 7.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(board_background, "scale", Vector2.ONE, 7.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
 func _panel_style(fill: String, edge: String) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(fill)
@@ -255,11 +264,18 @@ func _on_roll_pressed() -> void:
 		return
 	rolling = true
 	roll_button.disabled = true
-	for i in range(12):
+	var original_scale := dice_label.scale
+	for i in range(14):
 		dice_label.text = "🎲  " + str(rng.randi_range(1, 6))
-		await get_tree().create_timer(0.07).timeout
+		dice_label.rotation = deg_to_rad(rng.randf_range(-10.0, 10.0))
+		dice_label.scale = Vector2.ONE * rng.randf_range(0.9, 1.18)
+		await get_tree().create_timer(0.065).timeout
 	var roll := rng.randi_range(1, 6)
 	dice_label.text = "🎲  " + str(roll)
+	dice_label.rotation = 0.0
+	var settle := create_tween()
+	settle.tween_property(dice_label, "scale", Vector2(1.22, 1.22), 0.12)
+	settle.tween_property(dice_label, "scale", original_scale, 0.15)
 	var target := mini(step + roll, 23)
 	await _move_hero(target)
 	step = target
@@ -309,9 +325,17 @@ func _on_answer_selected(selected: int, correct: int) -> void:
 		child.queue_free()
 	if selected == correct:
 		_set_status("Correct! You earned a rescue star. Roll to continue.")
+		_flash_feedback(Color("#7dffb0"))
 	else:
 		_set_status("Not quite! The goblin gets closer. Try the next challenge.")
+		_flash_feedback(Color("#ff8c8c"))
 	roll_button.disabled = false
+
+func _flash_feedback(tint: Color) -> void:
+	var original := status_label.modulate
+	var tween := create_tween()
+	tween.tween_property(status_label, "modulate", tint, 0.12)
+	tween.tween_property(status_label, "modulate", original, 0.45)
 
 func _show_monster_encounter() -> void:
 	_set_status("A goblin blocks the trail! Your hero prepares for battle.")

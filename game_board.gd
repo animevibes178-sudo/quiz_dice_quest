@@ -159,7 +159,7 @@ func _build_ui() -> void:
 	board_col.add_child(path_grid)
 	for i in range(24):
 		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(60, 58)
+		tile.custom_minimum_size = Vector2(68, 62)
 		tile.size = Vector2(60, 58)
 		tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
 		var tile_content := VBoxContainer.new()
@@ -168,7 +168,7 @@ func _build_ui() -> void:
 		tile.add_child(tile_content)
 		var icon := TextureRect.new()
 		icon.name = "TileIcon"
-		icon.custom_minimum_size = Vector2(24, 24)
+		icon.custom_minimum_size = Vector2(28, 28)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -285,6 +285,7 @@ func _build_ui() -> void:
 	quiz_popup.custom_minimum_size = Vector2(520, 380)
 	quiz_popup.add_theme_stylebox_override("panel", _panel_style("#111827", "#f5d58a"))
 	quiz_popup.visible = false
+	quiz_popup.z_index = 100
 	add_child(quiz_popup)
 	var quiz_margin := MarginContainer.new()
 	quiz_margin.add_theme_constant_override("margin_left", 18)
@@ -401,9 +402,9 @@ func _rebuild_tiles(count: int) -> void:
 func _layout_winding_path() -> void:
 	if not is_instance_valid(path_grid):
 		return
-	var columns := 10
-	var tile_size := Vector2(60, 58)
-	var gap := 5.0
+	var columns := 8
+	var tile_size := Vector2(68, 62)
+	var gap := 6.0
 	for i in range(spaces.size()):
 		var row := int(i / columns)
 		var col := i % columns
@@ -501,6 +502,9 @@ func _on_roll_pressed() -> void:
 	_update_board()
 	rolling = false
 	_land_on_tile()
+	await get_tree().create_timer(0.15).timeout
+	if is_instance_valid(roll_button) and not awaiting_answer and not rolling and is_instance_valid(battle_overlay) and not battle_overlay.visible:
+		roll_button.disabled = step >= spaces.size() - 1
 
 func _land_on_tile() -> void:
 	var event_name: String = tile_events[step] if step < tile_events.size() else "empty"
@@ -604,8 +608,8 @@ func _show_boss_question() -> void:
 		)
 		answer_box.add_child(answer_button)
 	answer_box.visible = true
-	if is_instance_valid(quiz_popup): quiz_popup.visible = true
-	if is_instance_valid(quiz_popup): quiz_popup.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 	if fifty_fifty_charges > 0:
 		var helper := Button.new()
 		helper.text = "50/50 (%d left)" % fifty_fifty_charges
@@ -716,6 +720,8 @@ func _show_question(kind: String = "chest") -> void:
 		)
 		answer_box.add_child(answer_button)
 	answer_box.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 	if fifty_fifty_charges > 0:
 		var helper := Button.new()
 		helper.text = "50/50 (%d left)" % fifty_fifty_charges
@@ -747,7 +753,7 @@ func _show_question(kind: String = "chest") -> void:
 			awaiting_answer = false
 			_record_answer(question, false)
 			win_streak = 0
-			hero_hp = maxi(1, hero_hp - (5 + stage * 2))
+			hero_hp = maxi(0, hero_hp - (5 + 5 * stage))
 			_clear_answer_box()
 			_update_hero_stats()
 			_set_status("Time's up! Lost HP. Answer: %s" % str(question.answers[int(question.correct)]))
@@ -794,6 +800,8 @@ func _check_level_up() -> void:
 		)
 		answer_box.add_child(b)
 	answer_box.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 
 func _show_level_rewards() -> void:
 	awaiting_answer = true
@@ -825,6 +833,8 @@ func _show_level_rewards() -> void:
 		)
 		answer_box.add_child(b)
 	answer_box.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 
 func _flash_feedback(tint: Color) -> void:
 	var original := status_label.modulate
@@ -992,6 +1002,8 @@ func _show_retry_screen() -> void:
 	)
 	answer_box.add_child(retry_button)
 	answer_box.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 
 func _on_boss_defeated() -> void:
 	if stage >= stage_count and not endless_mode:
@@ -1046,6 +1058,8 @@ func _show_study_summary(won: bool) -> void:
 	menu_button.pressed.connect(func(): get_tree().change_scene_to_file("res://main_menu.tscn"))
 	answer_box.add_child(menu_button)
 	answer_box.visible = true
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = true
 
 func _update_hero_stats() -> void:
 	if is_instance_valid(hp_bar):

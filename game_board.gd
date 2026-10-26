@@ -38,7 +38,7 @@ var hero_idle_frame := 1
 var hero_animating := false
 var dice_label: Label
 var status_label: Label
-var path_grid: GridContainer
+var path_grid: Control
 var roll_button: Button
 var answer_box: VBoxContainer
 var rng := RandomNumberGenerator.new()
@@ -152,15 +152,15 @@ func _build_ui() -> void:
 	board_title.add_theme_font_size_override("font_size", 20)
 	board_title.add_theme_color_override("font_color", Color("#f5d58a"))
 	board_col.add_child(board_title)
-	path_grid = GridContainer.new()
-	path_grid.columns = 6
+	path_grid = Control.new()
+	path_grid.custom_minimum_size = Vector2(650, 340)
+	path_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	path_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	path_grid.add_theme_constant_override("h_separation", 8)
-	path_grid.add_theme_constant_override("v_separation", 8)
 	board_col.add_child(path_grid)
 	for i in range(24):
 		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(78, 72)
+		tile.custom_minimum_size = Vector2(60, 58)
+		tile.size = Vector2(60, 58)
 		tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
 		var tile_content := VBoxContainer.new()
 		tile_content.add_theme_constant_override("separation", 0)
@@ -168,7 +168,7 @@ func _build_ui() -> void:
 		tile.add_child(tile_content)
 		var icon := TextureRect.new()
 		icon.name = "TileIcon"
-		icon.custom_minimum_size = Vector2(30, 30)
+		icon.custom_minimum_size = Vector2(24, 24)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -179,7 +179,7 @@ func _build_ui() -> void:
 		label.text = str(i + 1)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 13)
+		label.add_theme_font_size_override("font_size", 11)
 		tile_content.add_child(label)
 		path_grid.add_child(tile)
 		spaces.append(tile)
@@ -354,7 +354,8 @@ func _rebuild_tiles(count: int) -> void:
 	while spaces.size() < count:
 		var i := spaces.size()
 		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(78, 72)
+		tile.custom_minimum_size = Vector2(60, 58)
+		tile.size = Vector2(60, 58)
 		tile.add_theme_stylebox_override("panel", _panel_style("#34465b", "#66758a"))
 		var tile_content := VBoxContainer.new()
 		tile_content.add_theme_constant_override("separation", 0)
@@ -362,7 +363,7 @@ func _rebuild_tiles(count: int) -> void:
 		tile.add_child(tile_content)
 		var icon := TextureRect.new()
 		icon.name = "TileIcon"
-		icon.custom_minimum_size = Vector2(30, 30)
+		icon.custom_minimum_size = Vector2(24, 24)
 		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -373,12 +374,29 @@ func _rebuild_tiles(count: int) -> void:
 		label.text = str(i + 1)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 13)
+		label.add_theme_font_size_override("font_size", 11)
 		tile_content.add_child(label)
 		path_grid.add_child(tile)
 		spaces.append(tile)
+	_layout_winding_path()
+
+func _layout_winding_path() -> void:
+	if not is_instance_valid(path_grid):
+		return
+	var columns := 10
+	var tile_size := Vector2(60, 58)
+	var gap := 5.0
+	for i in range(spaces.size()):
+		var row := int(i / columns)
+		var col := i % columns
+		if row % 2 == 1:
+			col = columns - 1 - col
+		var tile := spaces[i]
+		tile.position = Vector2(col * (tile_size.x + gap), row * (tile_size.y + gap))
+		tile.size = tile_size
 
 func _update_board() -> void:
+	_layout_winding_path()
 	for i in range(spaces.size()):
 		var tile := spaces[i]
 		var content := tile.get_child(0) as VBoxContainer

@@ -285,7 +285,6 @@ func _build_ui() -> void:
 	quiz_popup.add_child(quiz_margin)
 	answer_box = VBoxContainer.new()
 	answer_box.add_theme_constant_override("separation", 10)
-	quiz_popup.add_child(quiz_margin)
 	quiz_margin.add_child(answer_box)
 	_set_hero_frame(1)
 	_start_idle_animation()
@@ -566,7 +565,8 @@ func _show_boss_question() -> void:
 		)
 		answer_box.add_child(answer_button)
 	answer_box.visible = true
-		if is_instance_valid(quiz_popup): quiz_popup.visible = true
+	if is_instance_valid(quiz_popup): quiz_popup.visible = true
+	if is_instance_valid(quiz_popup): quiz_popup.visible = true
 	if fifty_fifty_charges > 0:
 		var helper := Button.new()
 		helper.text = "50/50 (%d left)" % fifty_fifty_charges

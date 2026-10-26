@@ -51,6 +51,9 @@ var battle_title: Label
 var battle_log: Label
 var hero_stats_label: Label
 var battle_stats_label: Label
+var hp_bar: ProgressBar
+var exp_bar: ProgressBar
+var quiz_popup: PanelContainer
 var hero_max_hp := 80
 var hero_hp := 80
 var hero_attack := 8
@@ -215,11 +218,29 @@ func _build_ui() -> void:
 	score.text = "Trail progress: 0 / 24"
 	score.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	side_col.add_child(score)
+	hp_bar = ProgressBar.new()
+	hp_bar.min_value = 0
+	hp_bar.max_value = hero_max_hp
+	hp_bar.value = hero_hp
+	hp_bar.show_percentage = false
+	hp_bar.custom_minimum_size = Vector2(0, 22)
+	hp_bar.add_theme_stylebox_override("background", _panel_style("#3b1720", "#7f1d1d"))
+	hp_bar.add_theme_stylebox_override("fill", _panel_style("#b91c1c", "#fca5a5"))
+	side_col.add_child(hp_bar)
 	hero_stats_label = Label.new()
 	hero_stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hero_stats_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hero_stats_label.add_theme_color_override("font_color", Color("#e2e8f0"))
 	side_col.add_child(hero_stats_label)
+	exp_bar = ProgressBar.new()
+	exp_bar.min_value = 0
+	exp_bar.max_value = _exp_needed()
+	exp_bar.value = experience
+	exp_bar.show_percentage = false
+	exp_bar.custom_minimum_size = Vector2(0, 14)
+	exp_bar.add_theme_stylebox_override("background", _panel_style("#172554", "#1d4ed8"))
+	exp_bar.add_theme_stylebox_override("fill", _panel_style("#2563eb", "#93c5fd"))
+	side_col.add_child(exp_bar)
 	_update_hero_stats()
 	dice_label = Label.new()
 	dice_label.text = "🎲  ?"
@@ -249,9 +270,23 @@ func _build_ui() -> void:
 	goblin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
 	goblin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	side_col.add_child(goblin)
+	quiz_popup = PanelContainer.new()
+	quiz_popup.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	quiz_popup.position = Vector2(-260, -190)
+	quiz_popup.custom_minimum_size = Vector2(520, 380)
+	quiz_popup.add_theme_stylebox_override("panel", _panel_style("#111827", "#f5d58a"))
+	quiz_popup.visible = false
+	add_child(quiz_popup)
+	var quiz_margin := MarginContainer.new()
+	quiz_margin.add_theme_constant_override("margin_left", 18)
+	quiz_margin.add_theme_constant_override("margin_right", 18)
+	quiz_margin.add_theme_constant_override("margin_top", 16)
+	quiz_margin.add_theme_constant_override("margin_bottom", 16)
+	quiz_popup.add_child(quiz_margin)
 	answer_box = VBoxContainer.new()
-	answer_box.add_theme_constant_override("separation", 6)
-	side_col.add_child(answer_box)
+	answer_box.add_theme_constant_override("separation", 10)
+	quiz_popup.add_child(quiz_margin)
+	quiz_margin.add_child(answer_box)
 	_set_hero_frame(1)
 	_start_idle_animation()
 	_start_goblin_animation()
@@ -531,6 +566,7 @@ func _show_boss_question() -> void:
 		)
 		answer_box.add_child(answer_button)
 	answer_box.visible = true
+		if is_instance_valid(quiz_popup): quiz_popup.visible = true
 	if fifty_fifty_charges > 0:
 		var helper := Button.new()
 		helper.text = "50/50 (%d left)" % fifty_fifty_charges
@@ -560,6 +596,8 @@ func _get_question(harder: bool = false) -> Dictionary:
 	return allowed[rng.randi_range(0, allowed.size() - 1)]
 
 func _clear_answer_box() -> void:
+	if is_instance_valid(quiz_popup):
+		quiz_popup.visible = false
 	for child in answer_box.get_children():
 		child.queue_free()
 	answer_box.visible = false
@@ -971,6 +1009,14 @@ func _show_study_summary(won: bool) -> void:
 	answer_box.visible = true
 
 func _update_hero_stats() -> void:
+	if is_instance_valid(hp_bar):
+		hp_bar.max_value = maxi(1, hero_max_hp)
+		hp_bar.value = clampi(hero_hp, 0, hero_max_hp)
+		hp_bar.tooltip_text = "HP: %d / %d" % [hero_hp, hero_max_hp]
+	if is_instance_valid(exp_bar):
+		exp_bar.max_value = maxi(1, _exp_needed())
+		exp_bar.value = clampi(experience, 0, _exp_needed())
+		exp_bar.tooltip_text = "EXP: %d / %d" % [experience, _exp_needed()]
 	if is_instance_valid(hero_stats_label):
 		hero_stats_label.text = "HP %d/%d   ATK %d   DEF %d\nLV %d   EXP %d/%d   Streak %d   50/50: %d" % [hero_hp, hero_max_hp, hero_attack, hero_defense, hero_level, experience, _exp_needed(), win_streak, fifty_fifty_charges]
 

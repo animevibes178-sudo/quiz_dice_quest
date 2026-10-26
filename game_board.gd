@@ -174,6 +174,15 @@ func _build_ui() -> void:
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		tile_content.add_child(icon)
+		var tile_hero := TextureRect.new()
+		tile_hero.name = "TileHero"
+		tile_hero.custom_minimum_size = Vector2(34, 28)
+		tile_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tile_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tile_hero.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tile_hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile_hero.visible = false
+		tile_content.add_child(tile_hero)
 		var label := Label.new()
 		label.name = "TileLabel"
 		label.text = str(i + 1)
@@ -369,6 +378,15 @@ func _rebuild_tiles(count: int) -> void:
 		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		tile_content.add_child(icon)
+		var tile_hero := TextureRect.new()
+		tile_hero.name = "TileHero"
+		tile_hero.custom_minimum_size = Vector2(34, 28)
+		tile_hero.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tile_hero.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		tile_hero.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tile_hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile_hero.visible = false
+		tile_content.add_child(tile_hero)
 		var label := Label.new()
 		label.name = "TileLabel"
 		label.text = str(i + 1)
@@ -401,6 +419,7 @@ func _update_board() -> void:
 		var tile := spaces[i]
 		var content := tile.get_child(0) as VBoxContainer
 		var icon := content.get_node("TileIcon") as TextureRect
+		var tile_hero := content.get_node("TileHero") as TextureRect
 		var label := content.get_node("TileLabel") as Label
 		var event_name: String = tile_events[i] if i < tile_events.size() else "empty"
 		var icon_map := {"start":"start","boss":"boss","fight":"goblin","chest":"scroll","heal":"potion","trap":"empty","lucky":"chest","skip":"scroll","empty":"empty"}
@@ -410,8 +429,10 @@ func _update_board() -> void:
 			icon.texture = load(icon_path)
 		else:
 			icon.texture = null
-		label.text = "YOU" if i == step else str(i + 1)
-		label.add_theme_color_override("font_color", Color.WHITE if i == step else Color("#e2e8f0"))
+		tile_hero.visible = i == step
+		tile_hero.texture = hero.texture if i == step and is_instance_valid(hero) else null
+		label.text = str(i + 1)
+		label.add_theme_color_override("font_color", Color("#fef3c7") if i == step else Color("#e2e8f0"))
 		if i == step:
 			tile.add_theme_stylebox_override("panel", _panel_style("#2878b8", "#ffffff"))
 			tile.scale = Vector2(1.06, 1.06)
